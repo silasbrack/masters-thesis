@@ -1,0 +1,15 @@
+\chapter{Results}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\linewidth]{figures/MnistMultiSwag.pdf}
+    \caption{In-distribution calibration curves for various variational families with variational inference and Laplace approximation trained on MURA.}
+    \label{fig:mura-cc-vi}
+\end{figure}
+
+\begin{table}
+    \centering
+    \caption[ELBO and $\hat{k}$-statistic for variational inference]{ELBO and $\hat{k}$-statistic for variational inference using different variational families trained on the eight schools test problem, with three replicates for normalizing flows.}
+    \label{tab:poi}
+    \input{tables/test.tex}
+\end{table}
