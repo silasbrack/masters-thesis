@@ -2,11 +2,10 @@ import logging
 
 import hydra
 import torch
+import wandb
 from dotenv import load_dotenv
 from omegaconf import DictConfig, OmegaConf
 from pytorch_lightning import LightningDataModule
-
-import wandb
 
 
 @hydra.main(config_path="../conf", config_name="config", version_base="1.2")
