@@ -1,0 +1,25 @@
+# local package
+-e .
+
+# external requirements
+flake8
+pre-commit
+black
+isort
+tqdm
+pytest
+hydra-core
+python-dotenv
+wandb
+
+# generic requirements
+numpy
+scipy
+pandas
+matplotlib
+seaborn
+
+# project requirements
+pytorch_lightning
+torch
+torchvision

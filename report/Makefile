@@ -12,7 +12,7 @@ clean:
 	rm -rf `biber --cache`
 	rm -rf _minted-$(root)
 	latexmk -bibtex -CA
-	find . -name \*.aux -type f -delete 
+	find . -name \*.aux -type f -delete
 	rm $(root).run.xml
 
 watch: clean
@@ -23,4 +23,3 @@ quick: clean
 
 view:
 	open $(root).pdf
-	
