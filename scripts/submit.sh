@@ -9,8 +9,8 @@
 #BSUB -R "select[hosts=1]"
 #BSUB -u s174433@student.dtu.dk
 #BSUB -N
-#BSUB -oo train-%J.out
-#BSUB -eo train-%J.err
+#BSUB -oo logs/train-%J.out
+#BSUB -eo logs/train-%J.err
 
 module load python3/3.9.11
 module load cuda/11.6

@@ -1,14 +1,10 @@
+Master's Thesis
+==============================
+
 # Setup
 
-* [If necessary to obtain the correct version of python and CUDA] `module load python3/3.9.11; module load cuda/11.6;`
-* `python3 -m venv venv/; source venv/bin/activate;`
-* `python -m pip install --no-cache-dir -U pip setuptools wheel;`
-* `python -m pip install --no-cache-dir -r requirements.txt;`
-* [Restart your terminal; you only need to run this once per device] `wandb login`
-* [Optional] `pre-commit install`
-* `echo "DATA_PATH=\"data/\"" > .env;`
-
 ## Quickstart
+
 ```bash
 git clone git@github.com:silasbrack/masters-thesis.git
 cd masters-thesis
@@ -20,11 +16,16 @@ source venv/bin/activate
 
 python -m pip install --no-cache-dir -U pip setuptools wheel
 python -m pip install --no-cache-dir -r requirements.txt
+```
 
-exec $SHELL
+Restart terminal.
+
+```bash
 wandb login
 pre-commit install
-echo "DATA_PATH=\"data/\"" > .env
+
+echo "DATA_DIR=\"data/\"" > .env
+python src/data/download_data.py
 ```
 
 ## Submitting batch jobs

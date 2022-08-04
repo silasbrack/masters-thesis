@@ -93,10 +93,6 @@ target/
 # Mypy cache
 .mypy_cache/
 
-# Lightning logs
-/lightning_logs/
-/logs/
-
 # Hydra logs
 /outputs/
 /multirun/

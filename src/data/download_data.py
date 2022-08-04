@@ -1,5 +1,4 @@
 import logging
-import os
 
 from dotenv import load_dotenv
 
@@ -10,7 +9,7 @@ def download_datasets():
     logger = logging.getLogger(__name__)
 
     logger.info("Downloading MNIST.")
-    MNISTDataModule(os.getenv("DATA_PATH"), 0, 0).prepare_data()
+    MNISTDataModule(0, 0).prepare_data()
 
 
 if __name__ == "__main__":
