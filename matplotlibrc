@@ -1,0 +1,6 @@
+font.sans-serif: TeX Gyre Heros
+axes.grid: True
+legend.edgecolor: none
+legend.fontsize: small
+savefig.dpi: 300
+path.simplify: True
