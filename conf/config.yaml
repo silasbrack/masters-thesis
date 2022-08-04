@@ -5,3 +5,5 @@ defaults:
   - optim: adam
 
 cwd: ${hydra:runtime.cwd}
+seed: null
+wandb_project: "masters-thesis"

@@ -101,6 +101,9 @@ target/
 *.out
 *.err
 
+# wandb logs
+/wandb/
+
 # Latex
 *.aux
 *.log

@@ -21,10 +21,13 @@ python -m pip install --no-cache-dir -r requirements.txt
 Restart terminal.
 
 ```bash
+cd masters-thesis
+source venv/bin/activate
+
 wandb login
 pre-commit install
 
-echo "DATA_DIR=\"data/\"" > .env
+cp .env.example .env
 python src/data/download_data.py
 ```
 

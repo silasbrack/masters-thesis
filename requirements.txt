@@ -2,24 +2,25 @@
 -e .
 
 # external requirements
-flake8
-pre-commit
 black
-isort
-tqdm
-pytest
+flake8
 hydra-core
+isort
+pre-commit
+pytest
 python-dotenv
+tqdm
 wandb
 
 # generic requirements
-numpy
-scipy
-pandas
 matplotlib
+numpy
+pandas
+scipy
 seaborn
 
 # project requirements
 pytorch_lightning
 torch
+torchmetrics
 torchvision

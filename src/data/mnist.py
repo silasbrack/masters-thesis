@@ -7,12 +7,12 @@ from torchvision.datasets import MNIST
 
 
 class MNISTDataModule(LightningDataModule):
-    def __init__(self, batch_size: int, num_workers: int):
+    def __init__(self, dir: str, batch_size: int, num_workers: int):
         super().__init__()
 
         self.name: str = "MNIST"
         self.size: int = 60000
-        self.data_dir: str = str(os.getenv("DATA_DIR"))
+        self.data_dir: str = dir
         self.batch_size: int = batch_size
         self.eval_batch_size: int = batch_size
         self.num_workers: int = num_workers
