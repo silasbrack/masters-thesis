@@ -18,6 +18,7 @@ numpy
 pandas
 scipy
 seaborn
+tikzplotlib
 
 # project requirements
 pytorch_lightning
