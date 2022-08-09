@@ -1,0 +1,2 @@
+_target_: src.optim.nng.NoisyNewtonGauss
+lr: 3e-4

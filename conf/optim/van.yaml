@@ -1,0 +1,2 @@
+_target_: src.optim.van.VariationalAdaptiveNewton
+lr: 3e-4

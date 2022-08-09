@@ -160,7 +160,7 @@ Then, a Gaussian mixture model (GMM) is formed as a combination of each Gaussian
 \end{align}
 
 % \begin{adjustwidth*}{0cm}{-0.4cm}
-%     \begin{lstlisting}[language=Python,caption=Fibonacci2,label=Fibonacci2]
+% \begin{lstlisting}[language=Python,caption=Fibonacci2,label=Fibonacci2]
 % # This is a comment
 % import easy
 % str = "I am a string"
@@ -175,32 +175,36 @@ Then, a Gaussian mixture model (GMM) is formed as a combination of each Gaussian
 % \end{lstlisting}
 % \end{adjustwidth*}
 
-% \begin{algorithm}
-%     \caption{Modified mini-batch $K$-means} \label{modifiedminibatch}
-%     \begin{algorithmic}[1]
-%         \State Given: $K$, mini-batch size $B$, iterations $T$, dataset $X$, correlation~matrix~$\mathrm{P}$.
-%         \State Initialize $C = \{\mathbf{c}^{(1)}, \mathbf{c}^{(2)}, \ldots, \mathbf{c}^{(K)}\}$ with random $\mathbf{x}$'es picked from $X$.
-%         \State $A \gets B \cdot T$ sorted random indexes to $X$, denoted $a_1, a_2, \ldots, a_{B\cdot T}$.
-%         \State $X' \gets \{\mathbf{x}^{(a_1)}, \mathbf{x}^{(a_2)}, \ldots, \mathbf{x}^{(a_{B\cdot T})}\}$ \Comment{Cache all points}
-%         \State $\textbf{size} \gets 0$
-%         \For {$i = 1$ to $T$}
-%         \State $M \gets B$ examples picked randomly from $X'$
+\begin{algorithm}
+    \caption{Modified mini-batch $K$-means} \label{modifiedminibatch}
+    \begin{algorithmic}[1]
+        \State Given: $K$, mini-batch size $B$, iterations $T$, dataset $X$, correlation~matrix~$\mathrm{P}$.
+        \State Initialize $C = \{\mathbf{c}^{(1)}, \mathbf{c}^{(2)}, \ldots, \mathbf{c}^{(K)}\}$ with random $\mathbf{x}$'es picked from $X$.
+        \State $A \gets B \cdot T$ sorted random indexes to $X$, denoted $a_1, a_2, \ldots, a_{B\cdot T}$.
+        \State $X' \gets \{\mathbf{x}^{(a_1)}, \mathbf{x}^{(a_2)}, \ldots, \mathbf{x}^{(a_{B\cdot T})}\}$ \Comment{Cache all points}
+        \State $\textbf{size} \gets 0$
+        \For {$i = 1$ to $T$}
+        \State $M \gets B$ examples picked randomly from $X'$
 
-%         \For{$\mathbf{x} \in M$} \Comment{\textit{Assignment step}}
-%         \State $\textbf{d}[\textbf{x}] \gets f(C,\mathbf{x}, \mathrm{P})$ \Comment{Cache closest center}
-%         \EndFor
+        \For{$\mathbf{x} \in M$} \Comment{\textit{Assignment step}}
+        \State $\textbf{d}[\textbf{x}] \gets f(C,\mathbf{x}, \mathrm{P})$ \Comment{Cache closest center}
+        \EndFor
 
-%         \For {$\mathbf{x} \in M$} \Comment{\textit{Update step}}
-%         \State $\textbf{c} \gets \textbf{d[x]}$ \Comment{Get cached center for current \textbf{x}}
-%         \State $\textbf{size}[\textbf{c}] \gets \textbf{size}[\textbf{c}] + 1$ \Comment{Update cluster size}
-%         \State $\eta \gets \frac{1}{\textbf{size}[\textbf{c}]}$       \Comment{Get learning rate}
-%         \State $\textbf{c} \gets (1 - \eta)\textbf{c}+\eta\textbf{x}$ \Comment{Take gradient step}
-%         \EndFor
-%         \EndFor
-%         \State \Return {$C$, \textbf{size}}
-%     \end{algorithmic}
-% \end{algorithm}
+        \For {$\mathbf{x} \in M$} \Comment{\textit{Update step}}
+        \State $\textbf{c} \gets \textbf{d[x]}$ \Comment{Get cached center for current \textbf{x}}
+        \State $\textbf{size}[\textbf{c}] \gets \textbf{size}[\textbf{c}] + 1$ \Comment{Update cluster size}
+        \State $\eta \gets \frac{1}{\textbf{size}[\textbf{c}]}$       \Comment{Get learning rate}
+        \State $\textbf{c} \gets (1 - \eta)\textbf{c}+\eta\textbf{x}$ \Comment{Take gradient step}
+        \EndFor
+        \EndFor
+        \State \Return {$C$, \textbf{size}}
+    \end{algorithmic}
+\end{algorithm}
 
 \section{Bayesian ADAM: Bayesian Adaptive Moment Estimation}
 
 \cite{khan2017variational, zhang2018noisy, miani2022laplacian}
+
+\section{Kronecker-Factored Approximate Curvature}
+
+\cite{martens2015optimizing}

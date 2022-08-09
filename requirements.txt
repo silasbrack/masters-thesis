@@ -4,7 +4,8 @@
 # external requirements
 black
 flake8
-hydra-core
+hydra-core==1.2
+omegaconf
 isort
 pre-commit
 pytest
