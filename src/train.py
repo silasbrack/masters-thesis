@@ -1,5 +1,6 @@
 """Trains a neural network and evaluates its performance."""
 import logging
+import os
 
 import hydra
 import torch
@@ -58,6 +59,9 @@ def main(cfg: DictConfig):
             optim.step()
             wandb.log({"epoch": epoch + 1, "train/loss": loss.detach().cpu().item(), "train/accuracy": accuracy})
     wandb.log({"train/final_accuracy": accuracy_fn.compute()})
+
+    torch.save(model.state_dict(), os.path.join(wandb.run.dir, "state_dict.pt"))
+    wandb.save(os.path.join(wandb.run.dir, "state_dict.pt"))
 
     confs = []
     predictions = []
