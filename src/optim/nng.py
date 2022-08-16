@@ -8,9 +8,13 @@ from src.optim.optimizer import Optimizer
 
 
 class NoisyNaturalGradient(Optimizer):
-    def __init__(self, params: Iterable, lr: float):
+    """Pytorch optimizer implementation of Noisy Natural Gradient algorithm."""
+
+    def __init__(self, params: Iterable, lr: float, *args, **kwargs):
+        super().__init__(params, *args, **kwargs)
         self.params: Iterable = params
         self.lr: float = lr
 
-    def step(self) -> torch.Tensor:
+    @torch.no_grad()
+    def step(self, *args, **kwargs) -> torch.Tensor:
         pass

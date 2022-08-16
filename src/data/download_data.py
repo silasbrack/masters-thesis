@@ -1,3 +1,7 @@
+"""Used to automatically download data to the path under `DATA_PATH` in your `.dotenv` file.
+
+Call using `make data`.
+"""
 import logging
 import os
 
@@ -7,6 +11,7 @@ from src.data import MNISTDataModule
 
 
 def download_datasets():
+    """Downloads all datasets used in this project to your DATA_PATH environment variable."""
     logger = logging.getLogger(__name__)
 
     logger.info("Downloading MNIST.")
@@ -14,8 +19,9 @@ def download_datasets():
 
 
 if __name__ == "__main__":
-    log_fmt = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    logging.basicConfig(level=logging.INFO, format=log_fmt)
+    # pylint: disable = R0801
+    LOG_FMT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    logging.basicConfig(level=logging.INFO, format=LOG_FMT)
     logging.captureWarnings(True)
     load_dotenv()
 

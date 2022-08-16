@@ -24,21 +24,27 @@ clean:
 ## Lint using flake8
 lint:
 	flake8 src
+	pylint src
 
 ## Load modules
-load_modules:
+modules:
 	module load python3/3.9.11
 	module load cuda/11.6
 
 ## Set up python interpreter environment
-create_environment:
+env:
 	$(PYTHON_INTERPRETER) -m venv venv/
-	$(PYTHON_INTERPRETER) -m pip install --no-cache-dir -U pip setuptools wheel
-	$(PYTHON_INTERPRETER) -m pip install --no-cache-dir -r requirements.txt
+	. venv/bin/activate; $(PYTHON_INTERPRETER) -m pip install --no-cache-dir -U pip setuptools wheel
+	. venv/bin/activate; $(PYTHON_INTERPRETER) -m pip install --no-cache-dir -r requirements.txt
 
 ## Run unit tests
-run_tests:
+test:
 	pytest -v tests/
+
+## Run pre-commit
+pre-commit:
+	pre-commit run --all-files
+
 
 #################################################################################
 # Self Documenting Commands                                                     #

@@ -4,6 +4,7 @@
 # external requirements
 black
 flake8
+pylint
 hydra-core==1.2
 omegaconf
 isort
@@ -22,7 +23,7 @@ seaborn
 tikzplotlib
 
 # project requirements
-pytorch_lightning
+pytorch-lightning
 torch
 torchmetrics
 torchvision

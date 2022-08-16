@@ -1,9 +1,12 @@
 defaults:
   - _self_
-  - models: resnet50
+  - models: conv
   - data: mnist
   - optim: adam
 
+epochs: 3
 cwd: ${hydra:runtime.cwd}
+device: cpu
 seed: null
+n_images_to_visualize: 5
 wandb_project: "masters-thesis"

@@ -1,0 +1,11 @@
+[MAIN]
+
+[BASIC]
+
+# Good variable names which should always be accepted, separated by a comma
+good-names=lr, x, y, i, j, k
+
+[FORMAT]
+
+# Maximum number of characters on a single line.
+max-line-length=119

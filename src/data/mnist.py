@@ -1,23 +1,56 @@
+"""Contains MNIST data module.
+
+Typical usage example:
+
+dm = MNISTDataModule("data/", batch_size=64, num_workers=4)
+dm.setup()
+train_loader = dm.train_dataloader()
+"""
 from typing import Union
 
-from pytorch_lightning import LightningDataModule
 from torch.utils.data import DataLoader, Dataset, random_split
 from torchvision import transforms
 from torchvision.datasets import MNIST
 
+from src.data.data_module import DataModule
 
-class MNISTDataModule(LightningDataModule):
+
+class MNISTDataModule(DataModule):
+    """
+    .. figure:: https://miro.medium.com/max/744/1*AO2rIhzRYzFVQlFLx9DM9A.png
+        :width: 400
+        :alt: MNIST
+    Specs:
+        - 10 classes (1 per digit)
+        - Each image is (1 x 28 x 28)
+    Standard MNIST, train, val, test splits and transforms.
+    Transforms::
+        mnist_transforms = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.1307,), (0.3081,)),
+        ])
+    Example::
+        from pl_bolts.datamodules import MNISTDataModule
+        dm = MNISTDataModule('.')
+        model = LitModel()
+        Trainer().fit(model, datamodule=dm)
+    """
+
+    name = "MNIST"
+    dataset_cls = MNIST
+    dims = (1, 28, 28)
+
     def __init__(self, data_dir: str, batch_size: int, num_workers: int):
+        """
+        :param data_dir: Where to save/load the data
+        :param batch_size: How many samples per batch to load
+        :param num_workers: How many workers to use for loading data
+        """
         super().__init__()
 
-        self.name: str = "MNIST"
-        self.size: int = 60000
         self.data_dir: str = data_dir
         self.batch_size: int = batch_size
         self.num_workers: int = num_workers
-        self.n_classes: int = 10
-        self.resolution: int = 28
-        self.channels: int = 1
 
         self.dataset_train: Union[Dataset, None] = None
         self.dataset_val: Union[Dataset, None] = None
@@ -66,3 +99,11 @@ class MNISTDataModule(LightningDataModule):
             num_workers=self.num_workers,
             batch_size=self.batch_size,
         )
+
+    @property
+    def num_classes(self) -> int:
+        """
+        Return:
+            10
+        """
+        return 10
