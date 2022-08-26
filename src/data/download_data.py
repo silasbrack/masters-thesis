@@ -19,7 +19,6 @@ def download_datasets():
 
 
 if __name__ == "__main__":
-    # pylint: disable = R0801
     LOG_FMT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     logging.basicConfig(level=logging.INFO, format=LOG_FMT)
     logging.captureWarnings(True)

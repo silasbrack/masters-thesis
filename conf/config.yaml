@@ -1,8 +1,13 @@
+# @package _global_
 defaults:
   - _self_
-  - models: conv
+  - model: conv
   - data: mnist
   - optim: adam
+
+  - experiment: null
+
+  - override hydra/job_logging: custom
 
 epochs: 3
 cwd: ${hydra:runtime.cwd}
@@ -10,3 +15,17 @@ device: cpu
 seed: null
 n_images_to_visualize: 5
 wandb_project: "masters-thesis"
+
+hydra:
+  run:
+    dir: logs/runs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: logs/multiruns/${now:%Y-%m-%d_%H-%M-%S}
+    subdir: ${hydra.job.num}
+  job:
+    chdir: true
+    env_set:
+      # currently there are some issues with running sweeps alongside wandb
+      # https://github.com/wandb/client/issues/1314
+      # this env var fixes that
+      WANDB_START_METHOD: thread

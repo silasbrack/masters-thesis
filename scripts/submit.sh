@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #BSUB -q gpua100
 #BSUB -J train
 #BSUB -n 8
@@ -18,4 +18,4 @@ source venv/bin/activate
 
 export CUDA_VISIBLE_DEVICES=0,1
 
-python src/train.py
+python src/train.py -m 'experiment=glob(*)' trainer.gpus=2

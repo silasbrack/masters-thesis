@@ -96,6 +96,7 @@ target/
 # Hydra logs
 /outputs/
 /multirun/
+/logs/
 
 # bsub logs
 *.out
