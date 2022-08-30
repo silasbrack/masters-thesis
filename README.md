@@ -1,5 +1,17 @@
-Master's Thesis
+Effortless Bayesian Deep Learning: Tapping into the Potential of Modern Optimizers
 ==============================
+
+Bayesian methods allow for estimates of uncertainty which enable more efficient usage of data (i.e., via active learning) and avoid overfitting.
+Furthermore, these uncertainty estimates improve model interpretability and assessment of model predictive confidence.
+
+Currently, approximate Bayesian methods are either expensive to compute (MCMC), are significantly more difficult to implement (such as variational inference), or simply perform poorly and are limited in their Bayesian interpretation (MC dropout).
+As such, there is demand for a method which exhibits the same computational cost as the optimization algorithms for deterministic neural networks while providing accurate posterior approximations and working out-of-the-box for any given architecture.
+
+In this project, we strive to develop an effortless Bayesian method.
+More specifically, this project investigates the connections between the Laplace approximation and the approximate second-order derivatives used in modern optimizers, such as Adam.
+We use a sampling-based training procedure, where a sample is first drawn from a Gaussian weight-posterior, a gradient step is performed on this sampled neural network, and the variance of the weight-posterior is updated with an approximate Hessian.
+Approximating the Hessian is the most time-consuming and painful-to-engineer step of this training procedure.
+In this project, we tap into the potential of modern machine learning frameworks to efficiently approximate the Hessian.
 
 # Development
 
@@ -21,13 +33,15 @@ module load cuda/11.6
 
 Now you should be on the correct version of python and CUDA.
 Now, create the python virtual environment by either running `make env` or the following script:
+Note that if you don't want to develop new code, you can remove the `--extra dev` flag in the `pip-compile` command to not download unnecessary packages.
 
 ```bash
 python3 -m venv venv/
 source venv/bin/activate
 
-python -m pip install --no-cache-dir -U pip setuptools wheel
-python -m pip install --no-cache-dir -r requirements.txt
+python -m pip install --no-cache-dir -U pip setuptools wheel pip-tools
+pip-compile --extra dev -o requirements.out pyproject.toml
+pip-sync requirements.out --pip-args "--no-cache-dir"
 ```
 
 Restart the terminal.
@@ -45,7 +59,7 @@ python src/data/download_data.py
 
 ## Submitting batch jobs
 
-* Run `bsub < scripts/submit.sh`
+* Run `bsub < scripts/submit.sh` from within your LSF environment.
 
 ## Debugging on GPU
 
