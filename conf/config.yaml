@@ -12,7 +12,7 @@ defaults:
 trainer:
   _target_: pytorch_lightning.Trainer
   max_epochs: 3
-  precision: 16
+#  precision: 16
 
 cwd: ${hydra:runtime.cwd}
 wandb_project: "masters-thesis"
