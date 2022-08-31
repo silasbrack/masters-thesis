@@ -1,4 +1,4 @@
 _target_: src.data.mnist.MNISTDataModule
 data_dir: ${oc.env:DATA_DIR}
 batch_size: 128
-num_workers: 4
+num_workers: 12
