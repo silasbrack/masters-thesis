@@ -31,6 +31,7 @@ def main(cfg: DictConfig):
         ],
     )
     trainer.fit(model, datamodule=data)
+    trainer.test(model, datamodule=data)
     wandb.finish()
 
 

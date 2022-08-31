@@ -39,9 +39,8 @@ Note that if you don't want to develop new code, you can remove the `--extra dev
 python3 -m venv venv/
 source venv/bin/activate
 
-python -m pip install --no-cache-dir -U pip setuptools wheel pip-tools
-pip-compile --extra dev -o requirements.out pyproject.toml
-pip-sync requirements.out --pip-args "--no-cache-dir"
+python -m pip install --no-cache-dir -U pip setuptools wheel
+python -m pip install --no-cache-dir -r requirements.txt
 ```
 
 Restart the terminal.
