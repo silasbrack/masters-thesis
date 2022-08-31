@@ -23,8 +23,8 @@ def main(cfg: DictConfig):
 
     data: DataModule = hydra.utils.instantiate(cfg.data)
     model: LightningModule = hydra.utils.instantiate(cfg.model)
-    trainer = Trainer(
-        max_epochs=cfg.epochs,
+    trainer: Trainer = hydra.utils.instantiate(
+        cfg.trainer,
         logger=WandbLogger(project=cfg.wandb_project),
         callbacks=[
             ModelCheckpoint(dirpath="checkpoints/", monitor="val/accuracy", mode="max", save_last=True),
