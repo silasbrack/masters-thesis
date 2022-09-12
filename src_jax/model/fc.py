@@ -18,6 +18,7 @@ class FcNet(eqx.Module):
         self.fc3 = nn.Linear(1024, 10, key=key)
 
     def __call__(self, x: jnp.array) -> jnp.array:
+        x = jnp.ravel(x)
         x = self.fc1(x)
         x = jnn.relu(x)
         x = self.fc2(x)

@@ -28,7 +28,8 @@ If you're running on the DTU LSF or are using environment modules, then run:
 
 ```bash
 module load python3/3.9.11
-module load cuda/11.6
+module load cuda/11.4
+module load cudnn/v8.2.2.26-prod-cuda-11.4
 ```
 
 Now you should be on the correct version of python and CUDA.

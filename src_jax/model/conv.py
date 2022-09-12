@@ -10,33 +10,33 @@ class ConvNet(eqx.Module):
     conv2: nn.Conv2d
     fc1: nn.Linear
     fc2: nn.Linear
-    do1: nn.Dropout
-    do2: nn.Dropout
-    key: jax.random.PRNGKey
+    # do1: nn.Dropout
+    # do2: nn.Dropout
+    # key: jax.random.PRNGKey
 
     def __init__(self, key: jax.random.PRNGKey):
-        self.key = key
+        # self.key = key
         self.conv1 = nn.Conv2d(1, 32, 3, 1, key=key)
         self.conv2 = nn.Conv2d(32, 64, 3, 1, key=key)
         self.fc1 = nn.Linear(1600, 128, key=key)
         self.fc2 = nn.Linear(128, 10, key=key)
-        self.do1 = nn.Dropout(0.25)
-        self.do2 = nn.Dropout(0.5)
+        # self.do1 = nn.Dropout(0.25)
+        # self.do2 = nn.Dropout(0.5)
 
     def __call__(self, x: jnp.array) -> jnp.array:
         x = self.conv1(x)
         x = jnn.relu(x)
         x = nn.MaxPool2d(2, stride=2)(x)
-        x = self.do1(x, key=self.key)
+        # x = self.do1(x, key=self.key)
         x = jnn.relu(x)
         x = self.conv2(x)
         x = jnn.relu(x)
         x = nn.MaxPool2d(2, stride=2)(x)
-        x = self.do1(x, key=self.key)
+        # x = self.do1(x, key=self.key)
         x = jnp.ravel(x)
         x = self.fc1(x)
         x = jnn.relu(x)
-        x = self.do2(x, key=self.key)
+        # x = self.do2(x, key=self.key)
         x = self.fc2(x)
         x = jnn.log_softmax(x)
         return x

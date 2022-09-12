@@ -1,8 +1,7 @@
 # @package _global_
-seed: 42
 trainer:
   accelerator: gpu
-  devices: 2
+  devices: 1
   strategy:
     _target_: pytorch_lightning.strategies.ddp.DDPStrategy
     find_unused_parameters: false

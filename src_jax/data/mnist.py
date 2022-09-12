@@ -26,17 +26,17 @@ import numpy as np
 from jax import numpy as jnp
 from torch.utils import data
 
-_DATA = "/tmp/jax_example_data/"
 
 
-def _download(url, filename):
+def _download(url, filename, data_dir):
+    
     """Download a url to a file in the JAX data temp directory."""
-    if not path.exists(_DATA):
-        os.makedirs(_DATA)
-    out_file = path.join(_DATA, filename)
+    if not path.exists(data_dir):
+        os.makedirs(data_dir)
+    out_file = path.join(data_dir, filename)
     if not path.isfile(out_file):
         urllib.request.urlretrieve(url, out_file)
-        print(f"downloaded {url} to {_DATA}")
+        print(f"downloaded {url} to {data_dir}")
 
 
 def _partial_flatten(x):
@@ -49,7 +49,7 @@ def _one_hot(x, k, dtype=np.float32):
     return np.array(x[:, None] == np.arange(k), dtype)
 
 
-def mnist_raw():
+def mnist_raw(data_dir):
     """Download and parse the raw MNIST dataset."""
     # CVDF mirror of http://yann.lecun.com/exdb/mnist/
     base_url = "https://storage.googleapis.com/cvdf-datasets/mnist/"
@@ -70,21 +70,21 @@ def mnist_raw():
         "t10k-images-idx3-ubyte.gz",
         "t10k-labels-idx1-ubyte.gz",
     ]:
-        _download(base_url + filename, filename)
+        _download(base_url + filename, filename, data_dir)
 
-    train_images = parse_images(path.join(_DATA, "train-images-idx3-ubyte.gz"))
-    train_labels = parse_labels(path.join(_DATA, "train-labels-idx1-ubyte.gz"))
-    test_images = parse_images(path.join(_DATA, "t10k-images-idx3-ubyte.gz"))
-    test_labels = parse_labels(path.join(_DATA, "t10k-labels-idx1-ubyte.gz"))
+    train_images = parse_images(path.join(data_dir, "train-images-idx3-ubyte.gz"))
+    train_labels = parse_labels(path.join(data_dir, "train-labels-idx1-ubyte.gz"))
+    test_images = parse_images(path.join(data_dir, "t10k-images-idx3-ubyte.gz"))
+    test_labels = parse_labels(path.join(data_dir, "t10k-labels-idx1-ubyte.gz"))
 
     return train_images, train_labels, test_images, test_labels
 
 
-def mnist(permute_train=False, flatten=False, one_hot=True) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+def mnist(data_dir, permute_train=False, flatten=False, one_hot=True) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Download, parse and process MNIST data to unit scale and one-hot labels."""
-    train_images, train_labels, test_images, test_labels = mnist_raw()
-    # train_images = train_images.reshape(-1, 1, 28, 28)
-    # test_images = test_images.reshape(-1, 1, 28, 28)
+    train_images, train_labels, test_images, test_labels = mnist_raw(data_dir)
+    train_images = train_images.reshape(-1, 1, 28, 28)
+    test_images = test_images.reshape(-1, 1, 28, 28)
     train_images = train_images / np.float32(255.0)
     test_images = test_images / np.float32(255.0)
 

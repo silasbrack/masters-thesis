@@ -24,6 +24,7 @@ tikzplotlib
 
 # project requirements
 pytorch-lightning
+-f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 jax[cuda]
 optax
 equinox
