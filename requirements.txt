@@ -24,6 +24,9 @@ tikzplotlib
 
 # project requirements
 pytorch-lightning
+jax[cuda]
+optax
+equinox
 --extra-index-url https://download.pytorch.org/whl/cu116
 torch
 torchmetrics
