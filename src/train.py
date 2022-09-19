@@ -1,4 +1,5 @@
 """Trains a neural network and evaluates its performance."""
+import json
 import logging
 
 import hydra
@@ -21,13 +22,15 @@ def main(cfg: DictConfig):
     if cfg.seed:
         seed_everything(cfg.seed)
 
-    wandb.init(project=cfg.wandb_project, reinit=True)
+    wandb.init(reinit=True)
+    with open(".wandb.json", "w") as f:
+        json.dump({"run_id": wandb.run.id}, f)
 
     data: DataModule = hydra.utils.instantiate(cfg.data)
     model: LightningModule = hydra.utils.instantiate(cfg.model)
     trainer: Trainer = hydra.utils.instantiate(
         cfg.trainer,
-        logger=WandbLogger(project=cfg.wandb_project),
+        logger=WandbLogger(),
         # callbacks=[
         #     ModelCheckpoint(dirpath="checkpoints/", monitor="val/accuracy", mode="max", save_last=True),
         # ],

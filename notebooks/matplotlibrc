@@ -1,3 +1,4 @@
+backend: agg
 font.sans-serif: TeX Gyre Heros
 axes.grid: True
 legend.edgecolor: none

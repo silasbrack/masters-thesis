@@ -15,7 +15,6 @@ trainer:
 #  precision: 16
 
 cwd: ${hydra:runtime.cwd}
-wandb_project: "masters-thesis"
 seed: null
 
 hydra:
