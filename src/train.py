@@ -2,13 +2,13 @@
 import logging
 
 import hydra
-import wandb
 from dotenv import load_dotenv
 from omegaconf import DictConfig
 from pytorch_lightning import LightningModule, Trainer, seed_everything
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
 
+import wandb
 from src.data.data_module import DataModule
 
 
@@ -21,14 +21,16 @@ def main(cfg: DictConfig):
     if cfg.seed:
         seed_everything(cfg.seed)
 
+    wandb.init(project=cfg.wandb_project, reinit=True)
+
     data: DataModule = hydra.utils.instantiate(cfg.data)
     model: LightningModule = hydra.utils.instantiate(cfg.model)
     trainer: Trainer = hydra.utils.instantiate(
         cfg.trainer,
         logger=WandbLogger(project=cfg.wandb_project),
-        callbacks=[
-            ModelCheckpoint(dirpath="checkpoints/", monitor="val/accuracy", mode="max", save_last=True),
-        ],
+        # callbacks=[
+        #     ModelCheckpoint(dirpath="checkpoints/", monitor="val/accuracy", mode="max", save_last=True),
+        # ],
     )
     trainer.fit(model, datamodule=data)
     trainer.test(model, datamodule=data)

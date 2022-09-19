@@ -77,15 +77,15 @@ class DataModule(ABC, LightningDataModule):
     def dataset_cls(self) -> Dataset:
         raise NotImplementedError
 
-    @property
-    @abstractmethod
-    def dims(self) -> Tuple[int, int, int]:
-        raise NotImplementedError
+    # @property
+    # @abstractmethod
+    # def dims(self) -> Tuple[int, int, int]:
+    #     raise NotImplementedError
 
-    @property
-    @abstractmethod
-    def num_classes(self) -> int:
-        raise NotImplementedError
+    # @property
+    # @abstractmethod
+    # def num_classes(self) -> int:
+    #     raise NotImplementedError
 
     @property
     @abstractmethod

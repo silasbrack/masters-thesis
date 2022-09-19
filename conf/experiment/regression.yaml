@@ -1,0 +1,19 @@
+# @package _global_
+# trainer:
+#   accelerator: gpu
+#   devices: 1
+#   strategy:
+#     _target_: pytorch_lightning.strategies.ddp.DDPStrategy
+#     find_unused_parameters: false
+
+defaults:
+  - override /data: housing
+  - override /model: linear
+
+hydra:
+  sweeper:
+    params:
+      model.latent_size: 32
+      model.num_layers: 1,2,3,4,5
+      # model.hessian_structure: full,diag,kron
+      # model.optimize_prior_precision: true,false

@@ -7,7 +7,7 @@ from torchmetrics.functional import accuracy
 
 
 class MNISTFCNet(nn.Module):
-    """Convolutional neural network for MNIST dataset."""
+    """Fully-connected neural network for MNIST dataset."""
 
     def __init__(self):
         super().__init__()

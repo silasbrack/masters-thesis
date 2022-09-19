@@ -1,0 +1,4 @@
+_target_: src.data.housing.HousingDataModule
+data_dir: ${oc.env:DATA_DIR}
+batch_size: 32
+num_workers: 12
