@@ -13,9 +13,11 @@
 #BSUB -eo logs/train-%J.err
 
 module load python3/3.9.11
-module load cuda/11.6
+module load cuda/11.4
+module load cudnn/v8.2.2.26-prod-cuda-11.4
 source venv/bin/activate
 
 export CUDA_VISIBLE_DEVICES=0,1
 
-python src/train.py -m 'experiment=glob(*)'
+# python src/train.py -m 'experiment=glob(*)'
+python src/train.py -m experiment=regression

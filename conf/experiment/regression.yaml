@@ -1,11 +1,11 @@
 # @package _global_
 trainer:
   max_epochs: 10
-  # accelerator: gpu
-  # devices: 1
-  # strategy:
-  #   _target_: pytorch_lightning.strategies.ddp.DDPStrategy
-  #   find_unused_parameters: false
+  accelerator: gpu
+  devices: 1
+  strategy:
+    _target_: pytorch_lightning.strategies.ddp.DDPStrategy
+    find_unused_parameters: false
 
 defaults:
   - override /data: housing
@@ -17,5 +17,5 @@ hydra:
       model.latent_size: 128
       model.num_layers: 1,2,3,4,5
       seed: 1
-      # model.hessian_structure: full,diag,kron
-      # model.optimize_prior_precision: true,false
+      model.hessian_structure: [diag]
+      model.optimize_prior_precision: [false,true]

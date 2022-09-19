@@ -4,6 +4,7 @@ from pytorch_lightning import LightningModule
 from torch import nn
 from torch.nn import MSELoss
 from torch.optim import Adam
+from omegaconf import OmegaConf
 
 
 class LinearLightningModule(LightningModule):
@@ -13,7 +14,7 @@ class LinearLightningModule(LightningModule):
         num_layers: int,
         latent_size: int,
         num_features: int,
-        hessian_structure: str,
+        hessian_structure,
         optimize_prior_precision: bool,
     ):
         super().__init__()
@@ -21,10 +22,8 @@ class LinearLightningModule(LightningModule):
         self.latent_size = latent_size
         self.num_features = num_features
         self.lr = lr
-        self.hessian_structure = hessian_structure if isinstance(hessian_structure, list) else [hessian_structure]
-        self.optimize_prior_precision = (
-            optimize_prior_precision if isinstance(optimize_prior_precision, list) else [optimize_prior_precision]
-        )
+        self.hessian_structure = OmegaConf.to_object(hessian_structure)
+        self.optimize_prior_precision = OmegaConf.to_object(optimize_prior_precision)
         self.loss = MSELoss()
         self.save_hyperparameters()
 

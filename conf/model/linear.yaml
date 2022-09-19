@@ -3,5 +3,5 @@ lr: 3e-4
 num_layers: 2
 latent_size: 32
 num_features: 8
-hessian_structure: [diag, full]
-optimize_prior_precision: [false, true]
+hessian_structure: [diag]
+optimize_prior_precision: [true]
