@@ -67,18 +67,23 @@ python src/data/download_data.py
 * If you're in Visual Studio Code, create a file under `.vscode/launch.json` with the following contents:
 ```json
 {
-    "name": "Python: Debug on GPU",
-    "type": "python",
-    "request": "attach",
-    "connect": {
-        "host": <GPU_IP>,
-        "port": <PORT>,
-    }
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Debug on GPU",
+            "type": "python",
+            "request": "attach",
+            "connect": {
+                "host": <GPU_IP>,
+                "port": <PORT>,
+            }
+        }
+    ]
 }
 ```
-where `<GPU_IP>` is the IP address of your GPU (e.g., `10.66.20.1`) and `<PORT>` is the port that the debugger is listening on (e.g., `1143`).
+where `<GPU_IP>` is the IP address of your GPU (e.g., `"10.66.20.1"`) and `<PORT>` is the port that the debugger is listening on (e.g., `1143`).
 
-Then, from your terminal on the GPU, run `python -m debugpy --wait-for-client --listen <GPU_IP>:<PORT> <FILE>`.
+Then, from your terminal on the GPU, run `python -m debugpy --listen <GPU_IP>:<PORT> <FILE>`.
 
 ## Creating new optimizers
 
