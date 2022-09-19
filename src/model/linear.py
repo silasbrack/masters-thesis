@@ -21,8 +21,10 @@ class LinearLightningModule(LightningModule):
         self.latent_size = latent_size
         self.num_features = num_features
         self.lr = lr
-        self.hessian_structure = hessian_structure
-        self.optimize_prior_precision = optimize_prior_precision
+        self.hessian_structure = hessian_structure if isinstance(hessian_structure, list) else [hessian_structure]
+        self.optimize_prior_precision = (
+            optimize_prior_precision if isinstance(optimize_prior_precision, list) else [optimize_prior_precision]
+        )
         self.loss = MSELoss()
         self.save_hyperparameters()
 
@@ -65,8 +67,8 @@ class LinearLightningModule(LightningModule):
 
     def on_train_epoch_end(self):
         """At the end of every epoch, log the Hessian."""
-        for opt in [False, True]:
-            for struct in ["full", "diag"]:
+        for opt in self.optimize_prior_precision:
+            for struct in self.hessian_structure:
                 la: ParametricLaplace = Laplace(
                     self.model,
                     likelihood="regression",
