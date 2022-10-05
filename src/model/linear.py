@@ -87,7 +87,7 @@ class LinearLightningModule(LightningModule):
                     la.posterior_precision,
                     f"posterior_precision_epoch{self.trainer.current_epoch}_{opt_str}_{struct}.pt",
                 )
-                torch.save(la.H, f"hessian_epoch{self.trainer.current_epoch}_{opt_str}_{struct}.pt")
+                # torch.save(la.H, f"hessian_epoch{self.trainer.current_epoch}_{opt_str}_{struct}.pt")
                 # self.log("hessian", la.H, sync_dist=True)
 
     def configure_optimizers(self):
