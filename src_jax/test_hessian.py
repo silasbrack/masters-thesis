@@ -50,17 +50,27 @@ x = jnp.ones(input_size)
 epsilon = jax.random.normal(key, input_size)
 
 
-hessian_prod = hvp(lambda x: g(f(x)), (x,), (epsilon,))  # Exact HVP
-p_out, d_outer, Gt = gvp(f, g, p_in=x, t_in=epsilon)  # GGN HVP
 hessian_fn = jax.jit(jax.hessian(lambda x: g(f(x))))
 hessian = hessian_fn(x)  # Exact Hessian
 print(f"{hessian=}")
-assert jnp.allclose(hessian @ epsilon, hessian_prod)
+
+hessian_prod_hvp = hvp(lambda x: g(f(x)), (x,), (epsilon,))  # Exact HVP
+p_out, d_outer, Gt = gvp(f, g, p_in=x, t_in=epsilon)  # GGN HVP
+hessian_prod = hessian @ epsilon  # Exact Hessian HVP
+
+assert jnp.allclose(hessian_prod, hessian_prod_hvp)
+assert jnp.allclose(hessian_prod_hvp, Gt)
 assert jnp.allclose(hessian_prod, Gt)
-assert jnp.allclose(hessian @ epsilon, Gt)
+
 
 opt_fn = lambda e: hvp(lambda x: g(f(x)), (x,), (e,))
-samples_cg, _ = jax.scipy.sparse.linalg.cg(opt_fn, epsilon)
-samples_inv = jax.scipy.linalg.inv(hessian) @ epsilon
-print(f"{samples_cg=}")
+samples_cg, _ = jax.scipy.sparse.linalg.cg(opt_fn, epsilon)  # Exact Conjugate Gradient HVP
+
+opt_fn = lambda e: gvp(f, g, p_in=x, t_in=e)[2]
+samples_cg_ggn, _ = jax.scipy.sparse.linalg.cg(opt_fn, epsilon)  # Conjugate Gradient GGN HVP
+
+samples_inv = jax.scipy.linalg.inv(hessian) @ epsilon  # Exact Inverse Hessian HVP
+
 assert jnp.allclose(samples_cg, samples_inv)
+assert jnp.allclose(samples_cg_ggn, samples_inv)
+assert jnp.allclose(samples_cg, samples_cg_ggn)
