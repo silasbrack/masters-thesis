@@ -104,3 +104,5 @@ target/
 
 # wandb logs
 /wandb/
+
+/papers/
