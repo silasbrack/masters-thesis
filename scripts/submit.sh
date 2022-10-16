@@ -1,5 +1,5 @@
 #!/bin/bash
-#BSUB -q gpuv100
+#BSUB -q gpua100
 #BSUB -J train
 #BSUB -n 8
 #BSUB -gpu "num=2"
