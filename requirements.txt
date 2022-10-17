@@ -32,3 +32,5 @@ equinox
 torch
 torchmetrics
 torchvision
+
+git+https://github.com/cybertronai/pytorch-sso.git
