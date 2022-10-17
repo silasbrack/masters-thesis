@@ -3,27 +3,58 @@
 % http://saul.cpsc.ucalgary.ca/pmwiki.php/GradTips/GradTipsChapter1Deconstruction
 % cs.stanford.edu/people/widom/paper-writing.html
 
-\section{The problem}
+\section{The Problem}
 
-\subsection{What is the problem?}
+% \subsection{What is the problem?}
 
-\subsection{Why is it interesting and important? (Motivation)}
+Bayesian methods allow for estimates of uncertainty which enable more
+efficient usage of data (i.e., via active learning) and avoid
+overfitting. Furthermore, these uncertainty estimates improve model
+interpretability and assessment of model predictive confidence.
 
-\section{Current state of research in the area}
+% \subsection{Why is it interesting and important? (Motivation)}
 
-\subsection{Why is it hard? (E.g. why do naïve approaches fail?)}
+Many different methods have been proposed for Bayesian inference, but
 
-\subsection{Why hasn’t it been solved before? (Or, what’s wrong with previous proposed solutions?)}
+\section{The State of Research in the Area}
+%
+% \subsection{Why is it hard? (E.g. why do naïve approaches fail?)}
+Currently, approximate Bayesian methods are either expensive to compute
+(Markov Chain Monte Carlo), are significantly more difficult to implement (such as
+variational inference), or simply perform poorly and are limited in
+their Bayesian interpretation (MC dropout). As such, there is demand for
+a method which exhibits the same computational cost as the optimization
+algorithms for deterministic neural networks while providing accurate
+posterior approximations and working out-of-the-box for any given
+architecture.
 
-\section{My solution}
+% \subsection{Why hasn’t it been solved before? (Or, what’s wrong with previous proposed solutions?)}
 
-\subsection{How does my solution differ?}
+\section{My Solution}
+
+% \subsection{How does my solution differ?}
 The ideas presented in this article essentially constitute a compilation of advice given by academics from multiple fields and institutions,
 
-\subsection{What are the key components of my approach and results? Are there any specific limitations?}
+% \subsection{What are the key components of my approach and results? Are there any specific limitations?}
 
-\section{Research objectives}
+\section{Research Objectives}
 
-\subsection{What are the goals for this project?}
-This should be discussed in a bit more detail in a thesis, since there are certain objectives discussed in the project plan.
-In an article, a quick sentence which summarises the rest of the introduction and states succinctly exactly which problem will be tackled and which approach will be made should suffice.
+% \subsection{What are the goals for this project?}
+
+This should be discussed in a bit more detail in a thesis, since there
+are certain objectives discussed in the project plan.
+In an article, a quick sentence which summarises the rest of the
+introduction and states succinctly exactly which problem will be tackled
+and which approach will be made should suffice.
+
+In this project, we strive to develop an effortless Bayesian method.
+More specifically, this project investigates the connections between the
+Laplace approximation and the approximate second-order derivatives used
+in modern optimizers, such as Adam. We use a sampling-based training
+procedure, where a sample is first drawn from a Gaussian
+weight-posterior, a gradient step is performed on this sampled neural
+network, and the variance of the weight-posterior is updated with an
+approximate Hessian. Approximating the Hessian is the most time
+consuming and painful-to-engineer step of this training procedure. In
+this project, we tap into the potential of modern machine learning
+frameworks to efficiently approximate the Hessian.

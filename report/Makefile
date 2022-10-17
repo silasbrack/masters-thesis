@@ -13,7 +13,11 @@ clean:
 	rm -rf _minted-$(root)
 	latexmk -bibtex -CA
 	find . -name \*.aux -type f -delete
-	rm $(root).run.xml
+	rm $(root).run.xml || true
+	rm $(root).nlg || true
+	rm $(root).nlo || true
+	rm $(root).nls || true
+	rm indent.log || true
 
 watch: clean
 	latexmk $(latexmkopts) -pvc $(root)

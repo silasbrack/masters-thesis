@@ -1,12 +1,254 @@
-\chapter{Literature Review}
+\chapter{Literature}
 % http://saul.cpsc.ucalgary.ca/pmwiki.php/GradTips/GradTipsLiteratureReview
 
-\section{Baselines}
+\section{Adam}
 
-\subsection{Variational Adaptive-Newton}
+% How does adam work?
+
+\cite{sutskever2013importance}
+\cite{kingma2014adam}
+
+% Integrate with the previous section
+Note that Adam approximates the second moment of the gradient of the loss, that this corresponds to the variance of this gradient, and that this is the diagonal of the Fisher information matrix, as we defined in \cref{sec:fisher-information} (\cref{eq:gradient-covariance})!
+% This is a common approximation in practice, as the diagonal of the Fisher information matrix is often sufficient to approximate the curvature of the log-likelihood.
+
+\section{K-FAC}
+
+Another alternative to approximating the Fisher information matrix is by calculating the Kronecker-factored Approximate Curvature (K-FAC).
+\cite{martens2015optimizing}
+
+\section{Noisy K-FAC}
+\cite{zhang2018noisy}
+
+\section{Gauss-Newton Optimization}
+\cite{botev2017practical}
+
+\section{Variational Adaptive-Newton}
 
 \cite{khan2017variational}
 
-\subsection{Noisy Natural Gradient}
+\section{Natural Gradient Variational Inference}
 
-\cite{zhang2018noisy}
+Natural gradient VI (VOGN)~\cite{osawa2019practical} approximates the posterior as
+%
+\begin{equation*}
+    p(\bm \theta) \approx \normal(\bm 0, \bm I / \delta)
+\end{equation*}
+%
+with an update of the natural parameter
+\begin{equation*}
+    \bm \lambda_{t+1} = (1 + \tau \rho) \bm \lambda_t - \rho \nabla_\mu \E{q}{\bar{\ell}(\bm \theta + 1 / 2 \tau \delta \bm\theta\T \bm\theta)}
+\end{equation*}
+
+\section{Laplace Approximation}
+
+In the Laplace approximation (LA)~\cite{daxberger2021laplace}, the posterior is approximated by a Gaussian, similarly to mean-field VI.
+However, instead of finding the optimal Gaussian distribution locations and scales by maximising the ELBO, the LA finds the location by computing the MAP solution \(\bm \theta_{\textsc{map}}\) and the scale by approximating the log posterior with a second degree Taylor expansion around this solution (\(\bm \theta_0 = \bm \theta_{\textsc{map}}\)) and determining the curvature via its Hessian matrix \(\bm H = \left.\nabla^2_{\bm \theta} \log p(\bm \theta \given \bm y) \right|_{\bm \theta_\mathrm{MAP}}\).
+Since the Taylor expansion is performed around the MAP solution, the first order derivative is zero, and the expansion is simply given by
+\begin{align*}
+    \ln p(\bm \theta \given \bm y)
+    \approx{} & \ln p(\bm \theta_{\textsc{map}} \given \bm y) + \frac{1}{2} (\bm \theta - \bm \theta_{\textsc{map}})\T \left( \left.\nabla^2_{\bm \theta} \ln p(\bm \theta \given \bm y) \right|_{\bm \theta_\mathrm{MAP}} \right) (\bm \theta - \bm \theta_{\textsc{map}}) %\label{eq:laplace-taylor}
+    \\ \Rightarrow \tilde{p}(\bm \theta \given \bm y) \approx{}& p(\bm \theta_{\textsc{map}} \given \bm y) \exp\left(\frac{1}{2} (\bm \theta - \bm \theta_{\textsc{map}})\T \bm H (\bm \theta - \bm \theta_{\textsc{map}})\right) \propto p(\bm \theta \given \bm y) \nonumber
+\end{align*}
+where \(\tilde{p}(\bm \theta \given \bm y)\) corresponds to the unnormalized posterior.
+Normalizing it yields
+\begin{align*}
+    p(\bm\theta \given \bm y) \approx{} & \sqrt{\frac{\det (- \bm H)}{(2 \pi)^D}} \exp\left(\frac{1}{2} (\bm \theta - \bm \theta_{\textsc{map}})\T \bm H (\bm \theta - \bm \theta_{\textsc{map}})\right) \nonumber
+    % \\={}& \sqrt{\frac{\det (- \bm H)}{(2 \pi)^D}} \exp\left(- \frac{1}{2} (\bm \theta - \bm \theta_0)\T (- \bm H) (\bm \theta - \bm \theta_0)\right) \nonumber
+    \\={}& \normal(\bm \theta_{\textsc{map}}, - \bm H^{-1}).%\label{eq:laplace}
+\end{align*}
+
+We have now shown that approximating the log-posterior with a second degree Taylor expansion around the \(\bm\theta_{\textsc{map}}\) corresponds to approximating the posterior with a Gaussian distribution given by \(\normal(\bm \theta_{\textsc{map}}, - \bm H^{-1})\) where \(\bm H = \left.\nabla^2_{\bm \theta} \log p(\bm \theta \given \bm y) \right|_{\bm \theta_{\textsc{map}}}\).
+
+In practice, we can determine the Hessian of the loss with respect to the parameters, where the loss is given by the negative log-posterior.
+In this case, we get \(\bm H = \left. - \nabla^2_{\bm \theta} \log p(\bm \theta \given \bm y) \right|_{\bm \theta_{\textsc{map}}} = \left. \nabla^2_{\bm \theta} \mathcal{L} \right|_{\bm \theta_{\textsc{map}}}\) and the posterior is approximated by \(\normal(\bm \theta_{\textsc{map}}, \bm H^{-1})\).
+
+\section{Linear Response Variational Bayes}
+
+% https://martiningram.github.io/vi-with-good-covariances/
+% https://github.com/martiningram/jax_advi/blob/main/jax_advi/lrvb.py#L49
+
+\cite{giordano2018covariances}
+
+INLA: Laplace for nested models (hierarchical models)
+\cite{rue2017bayesian}
+
+\section{Online Laplace}
+
+\cite{miani2022laplacian}
+
+% \section{Bayes’ Theorem}
+
+% Bayes' theorem describes the probability of an event occurring with respect to prior knowledge of that event.
+% Specifically for modelling, it can be used to relate latent variables with observed variables, allowing distributions on these latent variables to be inferred.
+% We therefore want to find the posterior \(p(\bm \theta \given \bm y)\) by
+% According to Bayes' theorem, the posterior is given by
+% \begin{align}\label{eq:bayes}
+%     p(\bm \theta \given \bm y) = \frac{\lik p(\bm \theta)}{p(\bm y)}
+% \end{align}
+% where \(\lik\) is the likelihood, parameterised by the model parameters \(\bm \theta\), \(p(\bm \theta) = p(\bm \theta; \bm \alpha)\) is the prior, parameterised by its hyper-parameters \(\bm \alpha\), and \(p(\bm y) = p_{\bm \theta}(\bm y)\) is the marginal likelihood (or evidence).
+
+% Furthermore, the posterior predictive probability, i.e., the probability of observing some new data, is given by
+% \begin{align}
+%     p(\bm y_{\mathrm{new}} \given \bm y) = \int p(\bm y_{\mathrm{new}} \given \bm \theta) p(\bm \theta \given \bm y)\,d\bm\theta.
+% \end{align}
+
+% \section{Variational Inference}
+
+% In variational inference (VI), we minimise the KL divergence between the posterior distribution \(p(\bm \theta \given \bm y)\) and a variational distribution \(q_{\bm \phi}(\bm \theta)\) parameterised by its variational parameters \(\bm \phi\) by optimising with respect to these parameters.
+% The KL divergence is defined as
+% \begin{align}
+%     \kld{q(\bm \theta)}{\lik} \equiv{} & \E{q}{\log \frac{q(\bm \theta)}{\lik}} \label{eq:kld}  \\
+%     ={}                                & \E{q}{\log q(\bm \theta)} - \E{q}{\log \lik} \nonumber
+% \end{align}
+% However, the KL divergence contains the evidence term \(\log p(\bm y)\), which is intractable.
+% Instead, we define a lower bound on this marginal likelihood term that is surrogate to the KL divergence (known as the ELBO).
+% Since they are surrogate, ELBO fulfils the property \(\elbo = \log p(\bm y) - \kld{q(\bm \theta)}{\lik}\), minimising the KL divergence is equivalent to maximising the ELBO, which is defined as
+% \begin{align}
+%     \elbo \equiv{} & \E{q}{\log p(\bm y, \bm \theta)} - \E{q}{\log q(\bm \theta)} \nonumber                                                                                         \\
+%     ={}            & \E{q}{\log \lik} + \E{q}{\log p(\bm \theta)} - \E{q}{\log q(\bm \theta)} \nonumber                                                                             \\
+%     ={}            & \E{q}{\log \lik} - \underbrace{- \E{q}{\log p(\bm \theta)}}_{\text{Cross-entropy}} + \underbrace{- \E{q}{\log q(\bm \theta)}}_{\text{Entropy}} \label{eq:elbo}
+% \end{align}
+% where the first term \(\E{q}{\log \lik}\) is the data (or likelihood) term, \(-\E{q}{\log p(\bm \theta)}\) is the cross-entropy of the prior with respect to the variational approximation, and \(-\E{q}{\log q(\bm \theta)}\) is the entropy term of the variational approximation.
+% The last two terms can be interpreted as the regularising KL divergence (or relative entropy) from the prior to the variational approximation, \(\kld{q(\bm \theta)}{p(\bm \theta)} = \E{q}{\log q(\bm \theta)} - \E{q}{\log p(\bm \theta)}\).
+% Furthermore, the likelihood term in the ELBO can be decomposed further by assuming independence in the observations, calculated as the term given by \(\E{q}{\log \lik} = \frac{1}{N} \sum^N_i \E{q}{\log p(y_i \given \bm \theta)}\).
+% Overall, BNNs have been found to be relatively ineffective unless the number of observations is greater than the number of model parameters.
+
+% \section{Methods}\label{ssec:methods}
+
+% Multiple approximate inference methods were implemented.
+% Specifically, \emph{maximum a posteriori} estimation, Laplace approximation, VI with mean-field, full-rank, low-rank and radial variational families, deep ensembles, and MultiSWAG.
+% These methods will be described in the following sections.
+
+% \subsection{Maximum a Posteriori Estimation}
+
+% \emph{Maximum a posteriori} estimation finds a point estimate of the posterior given by its maximum.
+% It can therefore be interpreted as a Delta distribution estimate of the posterior \(p(\bm \theta \given \bm y) \approx \delta(\bm \theta_\mathrm{MAP})\), where \(\bm \theta_{\text{MAP}}\) is defined as
+% \begin{align}
+%     \bm \theta_\mathrm{MAP}
+%     ={} & \max_{\bm \theta} p(\bm \theta \given \bm y) \nonumber                                            \\
+%     ={} & \max_{\bm \theta} \log p(\bm \theta \given \bm y) \nonumber                                       \\
+%     ={} & \max_{\bm \theta} \left[ \log \lik + \log p(\bm \theta) \right] \nonumber                         \\
+%     ={} & \max_{\bm \theta} \left[ \sum_{i=1}^N \log p(y_i \given \bm \theta) + \log p(\bm \theta) \right].
+% \end{align}
+% As an optimisation problem, maximising the posterior corresponds to minimising the regularised loss,
+% \begin{align}
+%     \bm \theta_{\text{MAP}} ={} & \arg \min_{\bm \theta} \mathcal{L}(\bm y; \bm \theta)                                                   \\
+%     ={}                         & \arg \min_{\bm \theta} \left[ -\sum_{i=1}^N \log p(y_i \given \bm \theta) - \log p(\bm \theta) \right].
+% \end{align}
+% In this formulation, the term \(-\sum_{i=1}^N \log p(y_i \given \bm \theta)\) is known as the empirical loss or reconstruction loss and the term \(\log p(\bm \theta)\) is the regulariser.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% \subsection{Mean-Field Variational Approximation}\label{ssec:mfvi}
+
+% One common variational family used to approximate the real posterior is a product of independent Gaussian distributions (the mean-field approximation) such that each model parameter is sampled from a normal distribution and is independent of all other model parameters, yielding a Gaussian with a diagonal covariance matrix.
+% In mean-field VI, model weights are sampled from an approximate posterior \(q(\bm \theta) \approx p(\bm{\theta} \given \bm y)\) as
+% \begin{align}
+%     q(\bm \theta) ={} & \normal(\bm \mu, \bm \sigma) \Leftrightarrow \nonumber         \\
+%     \bm{\theta} ={}   & \bm{\mu} + \bm{\sigma} \circ \bm{\epsilon}\label{eq:meanfield}
+% \end{align}
+% where \(\bm{\epsilon} \sim \normal(\bm 0, \identity)\).
+% For this type of variational approximation, the entropy term is given by \(\entropy{q(\theta)} = - \sum_i \log \sigma_i\) and the cross-entropy of the prior relative to the variational approximation is calculated via Monte Carlo simulation by taking the prior log probability with respect to mean-field posterior samples as
+% \begin{align}
+%     \crossentropy{q(\bm\theta)}{p(\bm\theta)} ={} & - \int q(\bm\theta) \log(p(\bm\theta))\,d\bm\theta \nonumber \\
+%     \approx{}                                     & \frac{1}{S} \sum^S_{s=1} \log p(\bm{\theta}^{(s)})
+% \end{align}
+% where \(\bm{\theta}^{(s)} \sim \normal(\bm{\mu}, \bm{\sigma})\).
+
+% The use of the mean-field approximation for BNNs has been found to be unreliable~\cite{wu2018deterministic} and, for increasingly wide neural networks, converges towards the prior~\cite{coker2021wide}.
+% However, for \emph{deep} BNNs, the mean-field assumption may be reasonable~\cite{farquhar2020liberty}.
+
+% \subsection{Full-Rank Variational Approximation}
+
+% As an alternative to the mean-field approximation, a full-rank approximation doesn't assume independence of the model parameters, instead being sampled as
+% \begin{align}\label{eq:fullrank}
+%     q(\bm \theta) = \normal(\bm \mu, \bm \Sigma_{\mathrm{FR}}).
+% \end{align}
+% For \(D\) model parameters, while a mean-field approximation has scale parameters \(\bm \sigma^D\), the full-rank approximation has scale parameters \(\bm \Sigma_{\mathrm{FR}}^{D \times D}\).
+% The variational parameters scale quadratically with the number of model parameters, which constitutes a significant limitation of this type of approximation.
+% Specifically, since NNs are typically overparameterised, possessing from thousands to millions to billions of parameters, the quadratic number of variational parameters makes this type of VI infeasible for BNNs.
+% As such, full-rank VI is not applied in any of the experiments in this paper.
+
+% \subsection{Low-Rank Variational Approximation}
+
+% As a compromise between the last two methods, a low-rank variational approximation uses a low-rank approximation of the covariance matrix \(\bm \Sigma_{\mathrm{LR}}\).
+% \begin{align}\label{eq:lowrank}
+%     q(\bm \theta) = \normal(\bm \mu, \bm \Sigma_{\mathrm{LR}}).
+% \end{align}
+% This approximation is obtained by reconstructing a covariance matrix paremeterised by the covariance factor \(\tilde{\bm \Sigma}\) and diagonal element vector \(\bm \sigma_{\text{diag}}\) as
+% \begin{align}
+%     \hat{\bm \Sigma}_{\text{LR}} = \tilde{\bm \Sigma} \tilde{\bm \Sigma}\T + \bm \sigma_{\text{diag}} \nonumber \\
+%     \bm \Sigma_{\text{LR}} = \min_{\hat{\bm \Sigma}_{\text{LR}}} \norm{\bm \Sigma - \hat{\bm \Sigma}_{\text{LR}}}_F \label{eq:lowrank-covariance}
+% \end{align}
+
+% \subsection{Radial Variational Approximation}
+
+% \textcite{farquhar2020radial} introduces the Radial approximate posterior,
+% For each NN layer, this posterior is sampled similarly to the mean-field (\cref{eq:meanfield}), but by normalising the \(\bm{\epsilon}\) term (projecting it onto a hypersphere) yielding a direction term \(\bm{\epsilon}/\norm{\bm{\epsilon}}\), and scaling it by the distance \(r\).
+% Therefore, for each layer, the radial posterior is sampled as
+% \begin{align}\label{eq:radial}
+%     q(\bm \theta) ={} & \mathrm{Radial}(\bm{\mu}, \bm{\sigma}) \nonumber                          \\
+%     \bm{\theta} ={}   & \bm{\mu} + \bm{\sigma} \circ \frac{\bm{\epsilon}}{\norm{\bm{\epsilon}}} r
+% \end{align}
+% where \(\bm{\epsilon} \sim \normal(\bm{0}, \identity)\), \(r \sim \normal(0, 1)\).
+% The entropy term of the Radial approximate posterior is given
+% \(\entropy{q(\theta)} = - \sum_i \log \sigma_i + \mathrm{const}\) (and is therefore approximately equal to the entropy of the mean-field approximation up to a constant) and the cross-entropy term is calculated via Monte Carlo simulation as for mean-field VI (\cref{ssec:mfvi}), but by sampling from a radial posterior \(\bm{\theta}^{(s)} \sim \mathrm{Radial}(\bm{\mu}, \bm{\sigma})\) as in \cref{eq:radial}.
+
+% \subsection{Deep Ensembles}
+
+% In deep ensembles~\cite{lakshminarayanan2017simple}, \(M\) neural networks are trained with different initialisations.
+% In this way, multiple local MAP solutions \(\bm\theta^{(m)}\) are obtained and equally considered, such that \(p(\bm \theta = \bm \theta^{(m)} \given \bm y) = 1 / M\) for every \(\bm \theta^{(m)} \in \{\bm\theta^{(1)}, \ldots, \bm\theta^{(M)}\}\) (and 0 elsewhere).
+% To make predictions with a deep ensemble, we use the posterior predictive given by
+% \begin{align}
+%     p(\bm y_{\mathrm{new}} \given \bm y)
+%     ={} & \int p(\bm y_{\mathrm{new}} \given \bm \theta) p(\bm \theta \given \bm y)\,d\bm\theta \nonumber \\
+%     ={} & \frac{1}{M} \sum_{m=1}^M p(\bm y_{\mathrm{new}} \given \bm\theta^{(m)})
+% \end{align}
+% where \(p(\bm y_{\mathrm{new}} \given \bm\theta^{(m)})\) are the normalised logits, or predicted probabilities, from model \(m\) in the ensemble.
+
+% \subsection{MultiSWAG}
+
+% Stochastic weight averaging estimates the final point estimate of the weights of a neural network \(\bm \theta_\mathrm{SWA}\) as the average of the model parameters \(\bm \theta\) at the end of each epoch obtained via gradient descent after convergence has been reached.
+
+% For SWAG~\cite{maddox2019simple}, the standard deviation of the model parameters \(\bm \sigma_\mathrm{SWA}\) is also calculated.
+% From the SWA estimates of the model parameter mean and standard deviations, the posterior is then estimated as
+% \begin{align}\label{eq:swag}
+%     p(\bm \theta \given \bm y) \approx{} & \normal(\bm \theta_\mathrm{SWA}, \bm \sigma_\mathrm{SWA}).
+% \end{align}
+
+% For MultiSWAG~\cite{wilson2020bayesian}, \(M\) SWAG estimates are obtained from different initialisations, as in deep ensembles.
+% Then, a Gaussian mixture model (GMM) is formed as a combination of each Gaussian SWAG posterior estimate \(\normal(\bm \theta_\mathrm{SWA}^{(m)}, \bm \sigma_\mathrm{SWA}^{(m)})\) where each component is equally weighed, as
+% \begin{align}\label{eq:multiswag}
+%     p(\bm \theta \given \bm y) \approx{} & \frac{1}{M} \sum_{m=1}^M \normal(\bm \theta_\mathrm{SWA}^{(m)}, \bm \sigma_\mathrm{SWA}^{(m)}).
+% \end{align}
+
+% % \begin{adjustwidth*}{0cm}{-0.4cm}
+% % \begin{lstlisting}[language=Python,caption=Fibonacci2,label=Fibonacci2]
+% % # This is a comment
+% % import easy
+% % str = "I am a string"
+% % def fib(n):
+% %     if n == 0:
+% %         return 0
+% %     elif n == 1:
+% %         return 1
+% %     else:
+% %         return fib(n-1) + fib(n-2)
+% % str5 = "It adjusts according to the spine"
+% % \end{lstlisting}
+% % \end{adjustwidth*}

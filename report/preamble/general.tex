@@ -123,6 +123,7 @@
 \captiontitlefinal{.}
 % strip things from equation references, making them "(1)" instead of "Equation~1"
 % from http://tex.stackexchange.com/questions/122174/how-to-strip-eq-from-cleveref
+
 \crefformat{equation}{(#2#1#3)}
 \crefrangeformat{equation}{(#3#1#4) to~(#5#2#6)}
 \crefmultiformat{equation}{(#2#1#3)}%
@@ -314,3 +315,13 @@
 \makeatother
 
 \usepackage{refcheck}
+\makeatletter
+\newcommand{\refcheckize}[1]{%
+    \expandafter\let\csname @@\string#1\endcsname#1%
+    \expandafter\DeclareRobustCommand\csname relax\string#1\endcsname[1]{%
+        \csname @@\string#1\endcsname{##1}\wrtusdrf{##1}}%
+    \expandafter\let\expandafter#1\csname relax\string#1\endcsname
+}
+\makeatother
+\refcheckize{\cref}
+\refcheckize{\Cref}

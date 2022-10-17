@@ -1,210 +1,188 @@
 \chapter{Theory}
 
-\section{Bayes’ Theorem}
+\section{Optimization in Deep Learning}
 
-Bayes' theorem describes the probability of an event occurring with respect to prior knowledge of that event.
-Specifically for modelling, it can be used to relate latent variables with observed variables, allowing distributions on these latent variables to be inferred.
-We therefore want to find the posterior \(p(\bm \theta \given \bm y)\) by
-According to Bayes' theorem, the posterior is given by
-\begin{align}\label{eq:bayes}
-    p(\bm \theta \given \bm y) = \frac{p(\bm y \given \bm \theta) p(\bm \theta)}{p(\bm y)}
+Suppose a neural network is a real-valued function \(f: \reals^n \times \reals^d \rightarrow \reals^o\) parameterized in \(\bm\theta\) which maps an input \(\bm x\) to an output \(f(\bm x; \bm\theta) \equiv f_{\bm\theta}(\bm x)\).
+Our goal is to find the optimal parameters \(\bm\theta^*\) which best model the observed data.
+
+From a frequentist perspective, we can define a loss function \(\mathcal{L}(\bm\theta): \reals^d \rightarrow \reals\) such that the optimal parameters \(\bm\theta^*\) minimize this loss function.
+Often the loss function is defined as the negative log-likelihood of the data under the model, \(\mathcal{L}(\bm\theta) = -\log \lik\).
+In this case, the goal of optimization is to find the parameters \(\bm\theta^*\) which maximize the likelihood of the data~\footnote{Maximizing the likelihood is equivalent to minimizing the negative log likelihood, since the log function is strictly monotonically increasing.}.
+
+From a Bayesian perspective, we define a prior distribution \(p(\bm\theta)\) and a likelihood function \(\lik\) such that the goal of optimization is to find the parameters \(\bm\theta^*\) which maximize the posterior distribution \(p(\bm\theta \given \bm y)\).
+This way, we can quantify the uncertainty in our model parameters \(\bm\theta\) by computing the posterior distribution \(p(\bm\theta \given \bm y)\).
+
+\subsection{Stochastic Gradient Descent}
+
+Stochastic gradient descent (SGD) is a first-order optimization algorithm which iteratively updates the parameters \(\bm\theta\) in the direction of the negative gradient of the loss function \(\mathcal{L}(\bm\theta)\).
+The update rule is given by
+%
+\begin{equation*}
+    \bm\theta_{t+1} = \bm\theta_t - \eta_t \nabla_{\bm\theta} \mathcal{L}(\bm\theta_t)
+\end{equation*}
+%
+where \(\eta_t\) is the learning rate at iteration \(t\).
+The learning rate \(\eta_t\) can be constant or adaptive, and is often chosen to be a decreasing function of \(t\).
+The gradient \(\nabla_{\bm\theta} \mathcal{L}(\bm\theta_t)\) is computed using a single training example \(\bm x_t, y_t\).
+The gradient is computed using the chain rule as
+%
+\begin{equation*}
+    \nabla_{\bm\theta} \mathcal{L}(\bm\theta_t) = \nabla_{\bm\theta} \log \lik(\bm x_t, y_t \given \bm\theta_t) \nabla_{\bm\theta} f_{\bm\theta_t}(\bm x_t)
+\end{equation*}
+%
+where \(\nabla_{\bm\theta} f_{\bm\theta_t}(\bm x_t)\) is the gradient of the neural network with respect to its parameters \(\bm\theta_t\).
+
+Note that \(\eta_t\) can be interpreted as the step size of the gradient descent algorithm.
+It can either be constant throughout training (\(\eta_t = \eta\)) or adaptive (if it varies throughout training).
+
+\section{The Hessian}
+
+The Hessian is a matrix of second-order partial derivatives of a scalar function.
+From now on, we will use the notation \(\nabla^2_{\bm\theta} f\) to represent the Hessian matrix of \(f\), where each element is given by \(\left(\nabla^2_{\bm\theta} f\right)_{i, j} = \frac{\partial^2 f}{\partial\theta_i \partial\theta_j}\).
+Suppose we have a function \(\mathcal{L}: \reals^d \rightarrow \reals\) parameterized by \(\bm \theta \in \reals^d\).
+Then the Hessian can be written as \(J_{\bm \theta}(\nabla_{\bm\theta} \mathcal{L})\).
+
+We are interested in the Hessian of the loss function \(\mathcal{L}(\bm\theta)\) with respect to the parameters \(\bm\theta\).
+For a neural network with \(d\) parameters, the Hessian is therefore a \(d \times d\) square matrix.
+Furthermore, if all of the neural network's second partial derivatives are continuous, then the Hessian is symmetric and positive definite.
+In this case, the Hessian is generally dominated by the block-diagonal \cite{martens2015optimizing}.
+
+\section{The Generalized Gauss-Newton Approximation}
+
+From the equation of the Hessian we can apply the chain rule twice and the product rule once to obtain a simpler expression
+%
+\begin{align}\label{eq:ggn-whole-hessian}
+    \nabla^2_{\bm \theta} \mathcal{L}
+    ={} & J_{\bm \theta}(\nabla_{\bm \theta} \mathcal{L})
+    = J_{\bm \theta}\left(\nabla_f \mathcal{L} \cdot \nabla_{\bm \theta} f\right) \nonumber
+    \\ ={}& J_{\bm \theta} (\nabla_{\bm \theta} f) \cdot \nabla_f \mathcal{L} + J_{\bm \theta} \left(\nabla_f \mathcal{L}\right) \cdot \nabla_{\bm \theta} f \nonumber
+    \\ ={}& \nabla^2_{\bm \theta} f \cdot \nabla_f \mathcal{L} + \nabla_{\bm \theta} f \T \cdot \nabla^2_f \mathcal{L} \cdot \nabla_{\bm \theta} f
 \end{align}
-where \(p(\bm y \given \bm \theta)\) is the likelihood, parameterised by the model parameters \(\bm \theta\), \(p(\bm \theta) = p(\bm \theta; \bm \alpha)\) is the prior, parameterised by its hyper-parameters \(\bm \alpha\), and \(p(\bm y) = p_{\bm \theta}(\bm y)\) is the marginal likelihood (or evidence).
+with \(\nabla_f\) representing the gradient with respect to \(f(\bm x)\).
 
-Furthermore, the posterior predictive probability, i.e., the probability of observing some new data, is given by
-\begin{align}
-    p(\bm y_{\mathrm{new}} \given \bm y) = \int p(\bm y_{\mathrm{new}} \given \bm \theta) p(\bm \theta \given \bm y)\,d\bm\theta.
+Assume now we will approximate \(f\) using a first-order Taylor expansion.
+This approximation is given by
+%
+\begin{align}\label{eq:nn-taylor}
+    f_{\bm \theta}(\bm x) \approx{} f_{\bm \theta_0}(\bm x) + \nabla_{\bm \theta} f_{\bm \theta_0}(\bm x) \cdot (\bm \theta - \bm \theta_0) .
+    \\ \text{Notice that } \nabla^2_{\bm \theta} f_{\bm \theta_0}(\bm x) = 0 \nonumber
 \end{align}
+%
+% Notice that, in this approximation, we have \(\nabla^2_{\bm \theta} f_{\bm \theta_0}(\bm x) = 0\).
+In this way, we are linearizing our neural network function.
+By combining \cref{eq:ggn-whole-hessian} and \cref{eq:nn-taylor} we then obtain the Gauss-Newton Hessian approximation,
+%
+\begin{align*}
+    \nabla^2_{\bm\theta} \mathcal{L}
+    \approx{} & (\nabla_{\bm\theta} f)\T (\nabla^2_f \mathcal{L}) (\nabla_{\bm\theta} f)
+\end{align*}
 
-\section{Variational Inference}
+For mean square error (MSE) loss, we have one output variable (\(o = 1\)), so \(f: \reals^n \times \reals^d \rightarrow \reals\).
+From the expression of MSE loss, we get the GGN-approximate Hessian
+%
+\begin{align*}%\label{eq:mse-hessian}
+    \nabla^2_{f} \mathcal{L} = & {} \frac{1}{N} \sum_{n=1}^N (y_n - f(\bm x_n))^2 = 1 \nonumber
+    \\ \Longrightarrow \nabla^2_{\bm\theta} \mathcal{L} =&{} (\nabla_{\bm\theta} f)\T (\nabla_{\bm\theta} f)
+\end{align*}
 
-In variational inference (VI), we minimise the KL divergence between the posterior distribution \(p(\bm \theta \given \bm y)\) and a variational distribution \(q_{\bm \phi}(\bm \theta)\) parameterised by its variational parameters \(\bm \phi\) by optimising with respect to these parameters.
-The KL divergence is defined as
-\begin{align}
-    \kld{q(\bm \theta)}{p(\bm y \given \bm \theta)} \equiv{} & \E{q}{\log \frac{q(\bm \theta)}{p(\bm y \given \bm \theta)}} \label{eq:kld}  \\
-    ={}                                                      & \E{q}{\log q(\bm \theta)} - \E{q}{\log p(\bm y \given \bm \theta)} \nonumber
+\section{Fisher Information}\label{sec:fisher-information}
+% https://agustinus.kristia.de/techblog/2018/03/11/fisher-information/
+
+Consider the gradients of the log-likelihood optimization objective, given by the expression \(\nabla_{\bm\theta} \log\lik\).
+We can show that the expectation of these gradients is zero:
+\begin{align*}
+    \E{\lik}{\nabla_{\bm\theta} \log\lik} = & {} \E{\lik}{\nabla \log \lik}
+    \\ =&{} \int \nabla \log \lik \lik \, d \bm y
+    \\ =&{} \int \frac{\nabla \lik}{\lik} \lik \, d \bm y % as per the chain rule
+    \\ =&{} \int \nabla \lik \, d \bm y % as per the Leibniz integral rule
+    \\ =&{} \nabla \int \lik \, d \bm y
+    \\ =&{} \nabla 1
+    \\ =&{} 0
+\end{align*}
+
+Let us now analyze the covariance of these gradients.
+It is given by
+%
+\begin{align}\label{eq:gradient-covariance}
+    %  & \cov{\lik}{\nabla \log\lik}
+    \E{\lik}{\left(\nabla \log\lik - \E{}{\nabla \log\lik}\right) \left(\nabla \log\lik - \E{}{\nabla \log\lik}\right)\T} \nonumber
+    \\ = \E{\lik}{\left(\nabla \log\lik - 0\right) \left(\nabla \log\lik - 0\right)\T} \nonumber
+    \\ = \E{\lik}{\nabla \log\lik \nabla \log\lik\T} \nonumber
+    \\ \equiv \mathcal{F}(\bm \theta)
 \end{align}
-However, the KL divergence contains the evidence term \(\log p(\bm y)\), which is intractable.
-Instead, we define a lower bound on this marginal likelihood term that is surrogate to the KL divergence (known as the ELBO).
-Since they are surrogate, ELBO fulfils the property \(\elbo = \log p(\bm y) - \kld{q(\bm \theta)}{p(\bm y \given \bm \theta)}\), minimising the KL divergence is equivalent to maximising the ELBO, which is defined as
-\begin{align}
-    \elbo \equiv{} & \E{q}{\log p(\bm y, \bm \theta)} - \E{q}{\log q(\bm \theta)} \nonumber                                                                                                               \\
-    ={}            & \E{q}{\log p(\bm y \given \bm \theta)} + \E{q}{\log p(\bm \theta)} - \E{q}{\log q(\bm \theta)} \nonumber                                                                             \\
-    ={}            & \E{q}{\log p(\bm y \given \bm \theta)} - \underbrace{- \E{q}{\log p(\bm \theta)}}_{\text{Cross-entropy}} + \underbrace{- \E{q}{\log q(\bm \theta)}}_{\text{Entropy}} \label{eq:elbo}
-\end{align}
-where the first term \(\E{q}{\log p(\bm y \given \bm \theta)}\) is the data (or likelihood) term, \(-\E{q}{\log p(\bm \theta)}\) is the cross-entropy of the prior with respect to the variational approximation, and \(-\E{q}{\log q(\bm \theta)}\) is the entropy term of the variational approximation.
-The last two terms can be interpreted as the regularising KL divergence (or relative entropy) from the prior to the variational approximation, \(\kld{q(\bm \theta)}{p(\bm \theta)} = \E{q}{\log q(\bm \theta)} - \E{q}{\log p(\bm \theta)}\).
-Furthermore, the likelihood term in the ELBO can be decomposed further by assuming independence in the observations, calculated as the term given by \(\E{q}{\log p(\bm y \given \bm \theta)} = \frac{1}{N} \sum^N_i \E{q}{\log p(y_i \given \bm \theta)}\).
-Overall, BNNs have been found to be relatively ineffective unless the number of observations is greater than the number of model parameters.
+%
+where we have defined the Fisher information matrix \(\mathcal{F}(\bm \theta)\) as the expectation of the outer product of the score function under our model.
+This product is usually intractable.
+It can, however, be approximated empirically by using samples from an empirical distribution \(q(\bm y)\) which is close to the true likelihood \(\lik\) \cref{eq:empirical-fisher}.
+%
+\begin{equation}\label{eq:empirical-fisher}
+    \mathcal{F} \approx \frac{1}{N} \sum^N_{n=1} \nabla \log p(y_n \given \bm \theta) \nabla \log p(y_n \given \bm \theta)\T.
+\end{equation}
+%
+Note, however, that this matrix is distinct from the Fisher information matrix~\cite{martens2020new, kunstner2019limitations}, since
 
-\section{Methods}\label{ssec:methods}
+Another nontrivial property of the Fisher information matrix is that it is equivalent to the negative expectation of the Hessian of the log-likelihood.
+%
+\begin{align*}
+    H_{\bm\theta} \left(\log \lik\right) = & {} \nabla^2_{\bm\theta} \log \lik
+    \\ =&{} \nabla_{\bm\theta} \nabla_{\bm\theta} \log \lik
+    \\ =&{} \nabla_{\bm\theta} \frac{\nabla_{\bm\theta} \lik}{\lik}
+    \\ =&{} \frac{}{}
+\end{align*}
+%
+The Fisher information matrix can therefore be interpreted as the curvature of the log-likelihood.
 
-Multiple approximate inference methods were implemented.
-Specifically, \emph{maximum a posteriori} estimation, Laplace approximation, VI with mean-field, full-rank, low-rank and radial variational families, deep ensembles, and MultiSWAG.
-These methods will be described in the following sections.
+RELATIONSHIP WITH GAUSS-NEWTON APPROXIMATION
+for common loss functions, the GGN is equivalent to the Fisher information matrix~\cite{martens2020new}
 
-\subsection{Maximum a Posteriori Estimation}
+RELATIONSHIP WITH KL DIVERGENCE
 
-\emph{Maximum a posteriori} estimation finds a point estimate of the posterior given by its maximum.
-It can therefore be interpreted as a Delta distribution estimate of the posterior \(p(\bm \theta \given \bm y) \approx \delta(\bm \theta_\mathrm{MAP})\), where \(\bm \theta_{\text{MAP}}\) is defined as
-\begin{align}
-    \bm \theta_\mathrm{MAP}
-    ={} & \max_{\bm \theta} p(\bm \theta \given \bm y) \nonumber                                            \\
-    ={} & \max_{\bm \theta} \log p(\bm \theta \given \bm y) \nonumber                                       \\
-    ={} & \max_{\bm \theta} \left[ \log p(\bm y \given \bm \theta) + \log p(\bm \theta) \right] \nonumber   \\
-    ={} & \max_{\bm \theta} \left[ \sum_{i=1}^N \log p(y_i \given \bm \theta) + \log p(\bm \theta) \right].
-\end{align}
-As an optimisation problem, maximising the posterior corresponds to minimising the regularised loss,
-\begin{align}
-    \bm \theta_{\text{MAP}} ={} & \arg \min_{\bm \theta} \mathcal{L}(\bm y; \bm \theta)                                                   \\
-    ={}                         & \arg \min_{\bm \theta} \left[ -\sum_{i=1}^N \log p(y_i \given \bm \theta) - \log p(\bm \theta) \right].
-\end{align}
-In this formulation, the term \(-\sum_{i=1}^N \log p(y_i \given \bm \theta)\) is known as the empirical loss or reconstruction loss and the term \(\log p(\bm \theta)\) is the regulariser.
+\section{The Natural Gradient}
+% https://agustinus.kristia.de/techblog/2018/03/14/natural-gradient/
 
-\subsection{Laplace Approximation}
 
-In the Laplace approximation (LA)~\cite{daxberger2021laplace}, the posterior is approximated by a Gaussian, similarly to mean-field VI.
-However, instead of finding the optimal Gaussian distribution locations and scales by maximising the ELBO, the LA finds the location by computing the MAP solution \(\bm \theta_{\text{MAP}}\) and the scale by approximating the log posterior with a second degree Taylor expansion around this solution (\(\bm \theta_0 = \bm \theta_{\text{MAP}}\)) and determining the curvature via its Hessian matrix \(\bm H = \left.\nabla^2_{\bm \theta} \log p(\bm \theta \given \bm y) \right|_{\bm \theta_\mathrm{MAP}}\).
-Since the Taylor expansion is performed around the MAP solution, the first order derivative is zero, and the expansion is simply given by
-\begin{align}
-    \ln p(\bm \theta \given \bm y) \approx{}     & \ln p(\bm \theta_0 \given \bm y)        + \frac{1}{2} (\bm \theta - \bm \theta_0)\T \bm H (\bm \theta - \bm \theta_0)                        \label{eq:laplace-taylor} \\
-    \tilde{p}(\bm \theta \given \bm y) \approx{} & p(\bm \theta_0 \given \bm y) \exp\left(-\frac{1}{2} (\bm \theta - \bm \theta_0)\T \bm H (\bm \theta - \bm \theta_0)\right).\nonumber
-\end{align}
-Normalising this unnormalised posterior yields the Laplace approximation of the posterior
-\begin{align}
-    p(\bm\theta \given \bm y) \approx{} & \sqrt{\frac{\det\bm H}{(2 \pi)^D}} \exp\left(-\frac{1}{2} (\bm \theta - \bm \theta_0)\T \bm H (\bm \theta - \bm \theta_0)\right) \nonumber \\
-    \approx{}                           & \normal(\bm \theta_0, \bm H^{-1}) = \normal(\bm \theta_{\text{MAP}}, \bm H^{-1}).\label{eq:laplace}
-\end{align}
+% Natural Gradient Descent is an approximate second-order optimisation method. It has an interpretation as optimizing over a Riemannian manifold using an intrinsic distance metric, which implies the updates are invariant to transformations such as whitening. By using the positive semi-definite (PSD) Gauss-Newton matrix to approximate the (possibly negative definite) Hessian, NGD can often work better than exact second-order methods.
 
-\subsection{Mean-Field Variational Approximation}\label{ssec:mfvi}
-
-One common variational family used to approximate the real posterior is a product of independent Gaussian distributions (the mean-field approximation) such that each model parameter is sampled from a normal distribution and is independent of all other model parameters, yielding a Gaussian with a diagonal covariance matrix.
-In mean-field VI, model weights are sampled from an approximate posterior \(q(\bm \theta) \approx p(\bm{\theta} \given \bm y)\) as
-\begin{align}
-    q(\bm \theta) ={} & \normal(\bm \mu, \bm \sigma) \Leftrightarrow \nonumber         \\
-    \bm{\theta} ={}   & \bm{\mu} + \bm{\sigma} \circ \bm{\epsilon}\label{eq:meanfield}
-\end{align}
-where \(\bm{\epsilon} \sim \normal(\bm 0, \identity)\).
-For this type of variational approximation, the entropy term is given by \(\entropy{q(\theta)} = - \sum_i \log \sigma_i\) and the cross-entropy of the prior relative to the variational approximation is calculated via Monte Carlo simulation by taking the prior log probability with respect to mean-field posterior samples as
-\begin{align}
-    \crossentropy{q(\bm\theta)}{p(\bm\theta)} ={} & - \int q(\bm\theta) \log(p(\bm\theta))\,d\bm\theta \nonumber \\
-    \approx{}                                     & \frac{1}{S} \sum^S_{s=1} \log p(\bm{\theta}^{(s)})
-\end{align}
-where \(\bm{\theta}^{(s)} \sim \normal(\bm{\mu}, \bm{\sigma})\).
-
-The use of the mean-field approximation for BNNs has been found to be unreliable~\cite{wu2018deterministic} and, for increasingly wide neural networks, converges towards the prior~\cite{coker2021wide}.
-However, for \emph{deep} BNNs, the mean-field assumption may be reasonable~\cite{farquhar2020liberty}.
-
-\subsection{Full-Rank Variational Approximation}
-
-As an alternative to the mean-field approximation, a full-rank approximation doesn't assume independence of the model parameters, instead being sampled as
-\begin{align}\label{eq:fullrank}
-    q(\bm \theta) = \normal(\bm \mu, \bm \Sigma_{\mathrm{FR}}).
-\end{align}
-For \(D\) model parameters, while a mean-field approximation has scale parameters \(\bm \sigma^D\), the full-rank approximation has scale parameters \(\bm \Sigma_{\mathrm{FR}}^{D \times D}\).
-The variational parameters scale quadratically with the number of model parameters, which constitutes a significant limitation of this type of approximation.
-Specifically, since NNs are typically overparameterised, possessing from thousands to millions to billions of parameters, the quadratic number of variational parameters makes this type of VI infeasible for BNNs.
-As such, full-rank VI is not applied in any of the experiments in this paper.
-
-\subsection{Low-Rank Variational Approximation}
-
-As a compromise between the last two methods, a low-rank variational approximation uses a low-rank approximation of the covariance matrix \(\bm \Sigma_{\mathrm{LR}}\).
-\begin{align}\label{eq:lowrank}
-    q(\bm \theta) = \normal(\bm \mu, \bm \Sigma_{\mathrm{LR}}).
-\end{align}
-This approximation is obtained by reconstructing a covariance matrix paremeterised by the covariance factor \(\tilde{\bm \Sigma}\) and diagonal element vector \(\bm \sigma_{\text{diag}}\) as
-\begin{align}
-    \hat{\bm \Sigma}_{\text{LR}} = \tilde{\bm \Sigma} \tilde{\bm \Sigma}\T + \bm \sigma_{\text{diag}} \nonumber \\
-    \bm \Sigma_{\text{LR}} = \min_{\hat{\bm \Sigma}_{\text{LR}}} \norm{\bm \Sigma - \hat{\bm \Sigma}_{\text{LR}}}_F \label{eq:lowrank-covariance}
-\end{align}
-
-\subsection{Radial Variational Approximation}
-
-\textcite{farquhar2020radial} introduces the Radial approximate posterior,
-For each NN layer, this posterior is sampled similarly to the mean-field (\cref{eq:meanfield}), but by normalising the \(\bm{\epsilon}\) term (projecting it onto a hypersphere) yielding a direction term \(\bm{\epsilon}/\norm{\bm{\epsilon}}\), and scaling it by the distance \(r\).
-Therefore, for each layer, the radial posterior is sampled as
-\begin{align}\label{eq:radial}
-    q(\bm \theta) ={} & \mathrm{Radial}(\bm{\mu}, \bm{\sigma}) \nonumber                          \\
-    \bm{\theta} ={}   & \bm{\mu} + \bm{\sigma} \circ \frac{\bm{\epsilon}}{\norm{\bm{\epsilon}}} r
-\end{align}
-where \(\bm{\epsilon} \sim \normal(\bm{0}, \identity)\), \(r \sim \normal(0, 1)\).
-The entropy term of the Radial approximate posterior is given
-\(\entropy{q(\theta)} = - \sum_i \log \sigma_i + \mathrm{const}\) (and is therefore approximately equal to the entropy of the mean-field approximation up to a constant) and the cross-entropy term is calculated via Monte Carlo simulation as for mean-field VI (\cref{ssec:mfvi}), but by sampling from a radial posterior \(\bm{\theta}^{(s)} \sim \mathrm{Radial}(\bm{\mu}, \bm{\sigma})\) as in \cref{eq:radial}.
-
-\subsection{Deep Ensembles}
-
-In deep ensembles~\cite{lakshminarayanan2017simple}, \(M\) neural networks are trained with different initialisations.
-In this way, multiple local MAP solutions \(\bm\theta^{(m)}\) are obtained and equally considered, such that \(p(\bm \theta = \bm \theta^{(m)} \given \bm y) = 1 / M\) for every \(\bm \theta^{(m)} \in \{\bm\theta^{(1)}, \ldots, \bm\theta^{(M)}\}\) (and 0 elsewhere).
-To make predictions with a deep ensemble, we use the posterior predictive given by
-\begin{align}
-    p(\bm y_{\mathrm{new}} \given \bm y)
-    ={} & \int p(\bm y_{\mathrm{new}} \given \bm \theta) p(\bm \theta \given \bm y)\,d\bm\theta \nonumber \\
-    ={} & \frac{1}{M} \sum_{m=1}^M p(\bm y_{\mathrm{new}} \given \bm\theta^{(m)})
-\end{align}
-where \(p(\bm y_{\mathrm{new}} \given \bm\theta^{(m)})\) are the normalised logits, or predicted probabilities, from model \(m\) in the ensemble.
-
-\subsection{MultiSWAG}
-
-Stochastic weight averaging estimates the final point estimate of the weights of a neural network \(\bm \theta_\mathrm{SWA}\) as the average of the model parameters \(\bm \theta\) at the end of each epoch obtained via gradient descent after convergence has been reached.
-
-For SWAG~\cite{maddox2019simple}, the standard deviation of the model parameters \(\bm \sigma_\mathrm{SWA}\) is also calculated.
-From the SWA estimates of the model parameter mean and standard deviations, the posterior is then estimated as
-\begin{align}\label{eq:swag}
-    p(\bm \theta \given \bm y) \approx{} & \normal(\bm \theta_\mathrm{SWA}, \bm \sigma_\mathrm{SWA}).
-\end{align}
-
-For MultiSWAG~\cite{wilson2020bayesian}, \(M\) SWAG estimates are obtained from different initialisations, as in deep ensembles.
-Then, a Gaussian mixture model (GMM) is formed as a combination of each Gaussian SWAG posterior estimate \(\normal(\bm \theta_\mathrm{SWA}^{(m)}, \bm \sigma_\mathrm{SWA}^{(m)})\) where each component is equally weighed, as
-\begin{align}\label{eq:multiswag}
-    p(\bm \theta \given \bm y) \approx{} & \frac{1}{M} \sum_{m=1}^M \normal(\bm \theta_\mathrm{SWA}^{(m)}, \bm \sigma_\mathrm{SWA}^{(m)}).
-\end{align}
-
-% \begin{adjustwidth*}{0cm}{-0.4cm}
-% \begin{lstlisting}[language=Python,caption=Fibonacci2,label=Fibonacci2]
-% # This is a comment
-% import easy
-% str = "I am a string"
-% def fib(n):
-%     if n == 0:
-%         return 0
-%     elif n == 1:
-%         return 1
-%     else:
-%         return fib(n-1) + fib(n-2)
-% str5 = "It adjusts according to the spine"
-% \end{lstlisting}
-% \end{adjustwidth*}
-
+\cite{amari1998natural} introduced the natural gradient as a way to optimize a function \(f\) parameterized by \(\bm\theta\) by following the direction of steepest descent in the Fisher information metric.
+It can be interpreted as
+The algorithm can be seen in \cref{natural-gradient}.
+%
 \begin{algorithm}
-    \caption{Modified mini-batch $K$-means} \label{modifiedminibatch}
+    \caption{Natural Gradient Descent} \label{natural-gradient}
     \begin{algorithmic}[1]
-        \State Given: $K$, mini-batch size $B$, iterations $T$, dataset $X$, correlation~matrix~$\mathrm{P}$.
-        \State Initialize $C = \{\mathbf{c}^{(1)}, \mathbf{c}^{(2)}, \ldots, \mathbf{c}^{(K)}\}$ with random $\mathbf{x}$'es picked from $X$.
-        \State $A \gets B \cdot T$ sorted random indexes to $X$, denoted $a_1, a_2, \ldots, a_{B\cdot T}$.
-        \State $X' \gets \{\mathbf{x}^{(a_1)}, \mathbf{x}^{(a_2)}, \ldots, \mathbf{x}^{(a_{B\cdot T})}\}$ \Comment{Cache all points}
-        \State $\textbf{size} \gets 0$
         \For {$i = 1$ to $T$}
-        \State $M \gets B$ examples picked randomly from $X'$
-
-        \For{$\mathbf{x} \in M$} \Comment{\textit{Assignment step}}
-        \State $\textbf{d}[\textbf{x}] \gets f(C,\mathbf{x}, \mathrm{P})$ \Comment{Cache closest center}
+        \State Calculate \(\mathcal{L}(\bm\theta)\)
+        \State Calculate the gradient of the loss \(\nabla_{\bm\theta} \mathcal{L}(\bm\theta)\)
+        \State Calculate the Fisher information matrix \(\mathcal{F}(\bm\theta)\)
+        \State Calculate the natural gradient \(\nabla_{\bm\theta} \mathcal{L}(\bm\theta) \mathcal{F}(\bm\theta)^{-1}\)
+        \State Update the parameters \(\bm\theta \gets \bm\theta - \eta \nabla_{\bm\theta} \mathcal{L}(\bm\theta) \mathcal{F}(\bm\theta)^{-1}\)
         \EndFor
-
-        \For {$\mathbf{x} \in M$} \Comment{\textit{Update step}}
-        \State $\textbf{c} \gets \textbf{d[x]}$ \Comment{Get cached center for current \textbf{x}}
-        \State $\textbf{size}[\textbf{c}] \gets \textbf{size}[\textbf{c}] + 1$ \Comment{Update cluster size}
-        \State $\eta \gets \frac{1}{\textbf{size}[\textbf{c}]}$       \Comment{Get learning rate}
-        \State $\textbf{c} \gets (1 - \eta)\textbf{c}+\eta\textbf{x}$ \Comment{Take gradient step}
-        \EndFor
-        \EndFor
-        \State \Return {$C$, \textbf{size}}
+        \State \Return {\(\bm\theta\)}
     \end{algorithmic}
 \end{algorithm}
+%
+In practice, deep learning models have millions (or billions) or parameters, and the Fisher information matrix is consequently often too large to be computed and stored.
+This therefore limits the applicability of the natural gradient.
+Instead, it is often approximated by the diagonal of the Hessian.
 
-\section{Bayesian ADAM: Bayesian Adaptive Moment Estimation}
-
-\cite{khan2017variational, zhang2018noisy, miani2022laplacian}
-
-\section{Kronecker-Factored Approximate Curvature}
-
+% This brings us to the Adam optimizer, which is a popular choice for optimizing deep neural networks.
+\cite{kingma2014adam}
 \cite{martens2015optimizing}
+\cite{botev2017practical}
+
+For a recent, detailed discussion of the natural gradient, see \cite{martens2020new}.
+\cite{wu2019logan}
+
+\section{Conjugate Gradient Descent}
+
+If allocation of memory to store a matrix is infeasible, but the computational graph for this matrix can be determined, then the conjugate gradient method can be used to approximate the inverse of this matrix~\cite{giordano2018covariances, nocedal1999numerical}.
+
+Instead of computing
+\begin{align*}
+    \bm \theta^* ={} & H^{-1} \bm \epsilon
+    \\\Rightarrow H \bm \theta^* ={} & H H^{-1} \bm \epsilon
+    \\\Rightarrow H \bm \theta^* ={}& \bm \epsilon.
+\end{align*}
+
+EXPLANATION
+\emph{When even calculating or instantiating Hηη is prohibitively time-consuming, one can use conjugate gradient algorithms to approximately compute H−1 ηη gη (Wright and Nocedal, 1999, Chapter 5). The advantage of conjugate gradient algorithms is that they approximate H−1 ηη gη using only the Hessian-vector product Hηη gη, which can be computed efficiently using automatic differentiation without ever forming the full Hessian Hηη. See, for example, the hessian vector product method of the Python autograd package (Maclaurin et al., 2015). Note that a separate conjugate gradient problem must be solved for each column of gη| , so if the parameter of interest g (θ) is high-dimensional it may be faster to pay the price for computing and inverting the entire matrix Hηη . See 5.3.2 for more discussion of a specific example. In Theorem 2, we require η0∗ to be at a true local optimum. Otherwise the estimated sensitivities may not be reliable (e.g., the covariance implied by Eq. (14) may not be positive definite). We find that the classical MFVB coordinate ascent algorithms (Blei et al. (2016, Section 2.4)) and even quasi-second order methods, such as BFGS (e.g., Regier et al., 2015), may not actually find a local optimum unless run for a long time with very stringent convergence criteria. Consequently, we recommend fitting models using second-order Newton trust region methods. When the Hessian is slow to compute directly, as in Section 5, one can use the conjugate gradient trust region method of Wright and Nocedal (1999, Chapter 7), which takes advantage of fast automatic differentiation Hessian-vector products without forming or inverting the full Hessian.}
