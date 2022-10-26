@@ -23,14 +23,17 @@ seaborn
 tikzplotlib
 
 # project requirements
-pytorch-lightning
--f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
-jax[cuda]
-optax
-equinox
 --extra-index-url https://download.pytorch.org/whl/cu116
+pytorch-lightning
 torch
 torchmetrics
 torchvision
 
+-f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+jax[cuda]
+optax
+equinox
+numpyro[cuda]
+
 git+https://github.com/cybertronai/pytorch-sso.git
+git+https://github.com/martiningram/jax_advi
