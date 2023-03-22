@@ -1,7 +1,64 @@
+# See https://matplotlib.org/stable/tutorials/introductory/customizing.html
+
 backend: agg
-font.sans-serif: TeX Gyre Heros
-axes.grid: True
-legend.edgecolor: none
+
+# See https://colorbrewer2.org/
+# axes.prop_cycle : (cycler('marker', ['o', 's', '^', 'v', '<', '>', 'd']) + cycler('color', ['e41a1c', '377eb8', '4daf4a', '984ea3', 'ff7f00', 'ffff33', 'a65628']) + cycler('ls', ['-', '--', ':', '-.', '-', '--', ':']))
+axes.prop_cycle: (cycler('marker', ['o', 's', '^', 'v', '<', '>', 'd']) + cycler('color', ['0C5DA5', '00B945', 'FF9500', 'FF2C00', '845B97', '474747', '9e9e9e']) + cycler('ls', ['-', '--', ':', '-.', '-', '--', ':']))
+# axes.prop_cycle : (cycler('marker', ['o', 's', '^', 'v', '<', '>', 'd']) + cycler('color', ['k', 'k', 'k', 'k', 'k', 'k', 'k']) + cycler('ls', ['-', '--', ':', '-.', '-', '--', ':']))
+# axes.prop_cycle : (cycler('marker', ['o', 's', '^', 'v', '<', '>']) + cycler('color', ["0d49fb", "e6091c", "26eb47", "8936df", "fec32d", "25d7fd"]) + cycler('ls', ['-', '--', ':', '-.', '-', '--']))
+
+figure.figsize: 3.3, 2.5 # max width is 3.5 for single column
+figure.dpi: 150
+figure.autolayout: true
+
+savefig.bbox: tight
+# savefig.transparent: true
+
+# legend.frameon: false
+patch.linewidth: 0
 legend.fontsize: small
-savefig.dpi: 300
-path.simplify: True
+# legend.fontsize: 7
+# legend.handlelength: 3
+
+lines.linewidth: 1.
+lines.markersize: 5 # or 3?
+lines.markeredgecolor: w
+lines.markeredgewidth: 0.3
+
+axes.titlesize: 8
+axes.labelsize: 8
+axes.axisbelow: true
+axes.linewidth: 0.5
+# axes.xmargin: 0
+# axes.ymargin: 0
+
+# font.family: serif
+# font.serif: Times
+# text.latex.preamble : \usepackage{amsmath} \usepackage{amssymb} \usepackage{mathptmx}
+font.family: sans-serif
+font.sans-serif: Helvetica, Arial, TeX Gyre Heros, DejaVu Sans, Lucida Grande, Verdana, Geneva, Lucid, Avant Garde, sans-serif
+mathtext.fontset: dejavusans
+text.latex.preamble: \usepackage{amsmath} \usepackage{amssymb} \usepackage{sfmath}
+
+text.usetex: true
+
+font.size: 8
+font.style: normal
+font.variant: normal
+font.stretch: normal
+font.weight: normal
+patch.force_edgecolor: true
+errorbar.capsize: 3
+image.cmap: viridis
+
+xtick.labelsize: 8
+xtick.direction: in
+xtick.top: true
+xtick.bottom: true
+# xtick.minor.visible : True
+ytick.labelsize: 8
+ytick.direction: in
+ytick.right: true
+ytick.left: true
+# ytick.minor.visible : True
